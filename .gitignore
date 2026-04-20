@@ -1,0 +1,58 @@
+# ─── Secrets ──────────────────────────────────────────────────────────
+.env
+.env.*
+
+# ─── Python ───────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+
+# ─── Virtual env ──────────────────────────────────────────────────────
+venv/
+env/
+.venv/
+
+# ─── IDE ──────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# ─── Backups & archives ───────────────────────────────────────────────
+*.bak
+*.bak2
+*.bak3
+archive_*/
+backups/
+
+# ─── Generated artifacts ──────────────────────────────────────────────
+report_*.pdf
+report_detailed_*.pdf
+test_*.pdf
+smoke_*.pdf
+*.pdf
+*.png
+
+# ─── Logs ─────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── Test data / temp ─────────────────────────────────────────────────
+test_frames/
+*.tmp
+
+# ─── Models / binaries ────────────────────────────────────────────────
+*.pt
+*.onnx
+
+# ─── Ad-hoc scripts (not part of production) ──────────────────────────
+patch*.py
+test[0-9]*.py
+regen*.py
+/video_parser.py
+/pdf_detailed_service.py
