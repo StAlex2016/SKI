@@ -537,7 +537,7 @@ T = {
         "month_ru_7":  "Июль",     "month_ru_8":  "Август",  "month_ru_9":  "Сентябрь",
         "month_ru_10": "Октябрь",  "month_ru_11": "Ноябрь",  "month_ru_12": "Декабрь",
         "video_too_long":         "Видео слишком длинное. Максимум 60 секунд.",
-        "video_error":            "Ошибка анализа видео: {e}",
+        "video_error":            "⚠️ Не удалось проанализировать видео. Возможные причины: слишком короткое/длинное видео, плохое освещение или проблема на нашей стороне. Администратор уведомлён. /start — попробовать снова",
         "ask_before_analyze":     "Есть фото с этого заезда? Добавь для точности — или сразу анализировать.",
         "btn_add_photos":         "📸 Добавить фото",
         "btn_analyze_now":        "🔍 Анализировать",
@@ -568,7 +568,7 @@ T = {
         "thanks_good":      "Спасибо 🙌",
         "ask_bad":          "Что было не так?",
         "thanks_fb":        "Спасибо за обратную связь!",
-        "error":            "Ошибка анализа: {e}",
+        "error":            "⚠️ Что-то пошло не так при анализе. Администратор уже уведомлён, мы разбираемся. Попробуйте позже — /start",
         "btn_analyze":      "🔍 Анализировать",
         "btn_add":          "📸 Добавить фото",
         "btn_restart":      "🔄 Начать заново",
@@ -625,7 +625,7 @@ T = {
         "month_en_7":  "July",      "month_en_8":  "August",   "month_en_9":  "September",
         "month_en_10": "October",   "month_en_11": "November", "month_en_12": "December",
         "video_too_long":         "Video too long. Max 60 seconds.",
-        "video_error":            "Video analysis error: {e}",
+        "video_error":            "⚠️ Could not analyse the video. Possible reasons: too short/long, poor lighting, or our-side issue. Admin notified. Tap /start to retry",
         "ask_before_analyze":     "Have photos from this run? Add them for better accuracy — or analyse now.",
         "btn_add_photos":         "📸 Add photos",
         "btn_analyze_now":        "🔍 Analyse now",
@@ -656,7 +656,7 @@ T = {
         "thanks_good":      "Thank you 🙌",
         "ask_bad":          "What went wrong?",
         "thanks_fb":        "Thank you for the feedback!",
-        "error":            "Analysis error: {e}",
+        "error":            "⚠️ Something went wrong during analysis. The admin has been notified. Please try again later — /start",
         "btn_analyze":      "🔍 Analyse",
         "btn_add":          "📸 Add photo",
         "btn_restart":      "🔄 Start over",
@@ -989,17 +989,21 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         state.append_photo(user_id, file_id)
         n = len(state.get_photos(user_id))
         if n < 5:
-            await update.message.reply_text(
+            sent = await update.message.reply_text(
                 t(lang, "extra_photo_added", n=n),
                 reply_markup=keyboard_extra_photos(lang)
             )
         else:
-            await update.message.reply_text(
+            sent = await update.message.reply_text(
                 f"📸 5/5 ✓",
                 reply_markup=InlineKeyboardMarkup([[
                     InlineKeyboardButton(t(lang, "btn_analyze_now"), callback_data="analyze_now"),
                 ]])
             )
+        # Track counter messages so they can be cleaned up when analysis starts
+        msg_ids = state.get(user_id, "photo_msg_ids", []) or []
+        msg_ids.append(sent.message_id)
+        state.set(user_id, "photo_msg_ids", msg_ids)
         return
 
     approved = state.get_approved(user_id)
@@ -1512,6 +1516,8 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "analyze_now":
         await query.edit_message_text("⏳ " + t(lang, "analyzing_video"))
         video_status_msg = query.message  # reference for deletion later
+        # Cleanup intermediate extra-photo counter messages (keep the last — now shows "⏳")
+        await _cleanup_photo_counters(user_id, context, keep_last=True)
 
         video_path   = state.get_video_path(user_id)
         extra_photos = state.get_photos(user_id)
@@ -1642,7 +1648,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     pass
 
         state.reset_session(user_id)
-        await context.bot.send_message(user_id, t(lang, "analysis_complete"))
+        # 'analysis_complete' message removed — PDF + feedback buttons already signal completion
 
     elif data == "add_more":
         approved = len(state.get_approved(user_id))
