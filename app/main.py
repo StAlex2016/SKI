@@ -579,7 +579,7 @@ T = {
         "new_video_prompt": "Отправь новое видео (до 60 сек)",
     },
     "en": {
-        "welcome":          "Hi! I analyze alpine skiing technique from photos and video.\n\nChoose analysis type 👇",
+        "welcome":          "🎿 <b>Alpine Ski Performance Lab</b> — AI coach for alpine ski technique.\n\n📸 From photos — quick technique snapshot\n🎥 From video — detailed run analysis\n\nReport in 2 min. Choose type 👇",
         "start_btn":        "🎿 Start analysis",
         "admin_btn":        "⚙️ Admin",
         "admin_title":      "⚙️ <b>Admin panel</b>",
