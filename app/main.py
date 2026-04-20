@@ -491,7 +491,7 @@ def detect_lang(user) -> str:
 
 T = {
     "ru": {
-        "welcome":          "Привет! Я анализирую технику горных лыж по фото и видео.\n\nВыбери тип анализа 👇",
+        "welcome":          "🎿 Привет! Я Alpine Ski Performance Lab — AI-тренер по горнолыжной технике.\n\n📸 <b>По фото</b> — быстрый разбор (бесплатно)\n🎥 <b>По видео</b> — детальный разбор с фазами поворота\n\nРазбор занимает 1-2 минуты. Выбери тип 👇",
         "start_btn":        "🎿 Начать анализ",
         "admin_btn":        "⚙️ Админ",
         "admin_title":      "⚙️ <b>Админ-панель</b>",
@@ -705,8 +705,8 @@ def keyboard_analyze(lang):
 
 def keyboard_add_or_analyze(lang):
     return InlineKeyboardMarkup([[
-        InlineKeyboardButton(t(lang, "btn_add"), callback_data="add_more"),
         InlineKeyboardButton(t(lang, "btn_analyze"), callback_data="do_analyze"),
+        InlineKeyboardButton(t(lang, "btn_add"), callback_data="add_more"),
     ]])
 
 def keyboard_warning(lang, at_limit=False):
@@ -716,8 +716,8 @@ def keyboard_warning(lang, at_limit=False):
             InlineKeyboardButton(t(lang, "btn_analyze"), callback_data="do_analyze_confirmed"),
         ]])
     return InlineKeyboardMarkup([[
-        InlineKeyboardButton(t(lang, "btn_add"), callback_data="add_more"),
         InlineKeyboardButton(t(lang, "btn_analyze"), callback_data="do_analyze_confirmed"),
+        InlineKeyboardButton(t(lang, "btn_add"), callback_data="add_more"),
     ]])
 
 def keyboard_mode(lang):
@@ -735,11 +735,11 @@ def keyboard_run_type(lang):
 def keyboard_before_analyze(lang):
     return InlineKeyboardMarkup([
         [
-            InlineKeyboardButton(t(lang, "btn_add_photos"),  callback_data="add_photos_before"),
-            InlineKeyboardButton(t(lang, "btn_new_video"), callback_data="upload_new_video"),
+            InlineKeyboardButton(t(lang, "btn_analyze_now"), callback_data="analyze_now"),
         ],
         [
-            InlineKeyboardButton(t(lang, "btn_analyze_now"), callback_data="analyze_now"),
+            InlineKeyboardButton(t(lang, "btn_add_photos"),  callback_data="add_photos_before"),
+            InlineKeyboardButton(t(lang, "btn_new_video"), callback_data="upload_new_video"),
         ],
     ])
 
@@ -832,8 +832,8 @@ def keyboard_date_presets(lang):
 
 def keyboard_extra_photos(lang):
     return InlineKeyboardMarkup([[
-        InlineKeyboardButton("📸 Ещё" if lang == "ru" else "📸 More", callback_data="more_extra"),
         InlineKeyboardButton(t(lang, "btn_analyze_now"),                callback_data="analyze_now"),
+        InlineKeyboardButton("📸 Ещё" if lang == "ru" else "📸 More", callback_data="more_extra"),
     ]])
 
 
@@ -923,7 +923,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
         t(lang, "welcome"),
-        reply_markup=keyboard_mode(lang)
+        reply_markup=keyboard_mode(lang),
+        parse_mode="HTML"
     )
 
 
@@ -1171,13 +1172,19 @@ async def run_analyze(user_id: int, context: ContextTypes.DEFAULT_TYPE, reply_fu
             await reply_func(t(lang, "need_3"))
         return
 
-    await reply_func(t(lang, "checking"))
+    checking_msg = await context.bot.send_message(user_id, t(lang, "checking"))
 
     image_urls = [await get_file_url(context.bot, fid) for fid in new_photos]
     quality_text = await check_images_quality(
         image_urls=image_urls, discipline=discipline, category=category, lang=lang, user_id=user_id
     )
     quality = parse_quality_result(quality_text)
+
+    # Remove the "Reviewing photo quality..." message now that we have a verdict
+    try:
+        await checking_msg.delete()
+    except Exception:
+        pass
 
     if quality["bad_indexes"]:
         new_good = [p for i, p in enumerate(new_photos) if i not in quality["bad_indexes"]]
