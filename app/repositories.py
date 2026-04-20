@@ -148,13 +148,14 @@ def get_stats():
 import json as _json
 
 def track(telegram_user_id, event_type: str, **payload):
-    """Append a user/system event to the events table.
+    """Append a user/system event to the events table + mirror to PostHog.
 
     Usage:
       track(user_id, "start", lang="ru")
       track(user_id, "discipline_selected", discipline="GS")
       track(user_id, "analysis_completed", mode="photo", duration_sec=12.4, score=7.5)
     """
+    # 1) DB events table (source of truth for admin reports)
     try:
         conn = get_connection()
         cur = conn.cursor()
@@ -166,7 +167,13 @@ def track(telegram_user_id, event_type: str, **payload):
         cur.close()
         conn.close()
     except Exception:
-        # Tracking must never crash the bot — swallow errors silently
+        pass  # tracking must never crash the bot
+
+    # 2) Mirror to PostHog (silent if not configured)
+    try:
+        from app.utils.posthog_client import capture as _ph_capture
+        _ph_capture(telegram_user_id, event_type, payload)
+    except Exception:
         pass
 
 

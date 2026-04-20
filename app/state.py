@@ -129,8 +129,12 @@ def set_video_path(user_id: int, path: str):
 
 def reset_session(user_id: int):
     """Полный сброс сессии — при /start, restart, после анализа."""
+    # NOTE: last_analysis_id is deliberately NOT reset — feedback arrives
+    # AFTER reset_session (user clicks 👍/👎 after seeing PDF). We keep it
+    # so save_feedback can link to the analysis. It's overwritten on next
+    # analysis start, and has a 24h TTL from Redis.
     for field in ["photos", "approved", "state", "discipline",
-                  "category", "photo_limit", "last_analysis_id",
+                  "category", "photo_limit",
                   "analysis_mode", "run_type", "video_path", "photo_msg_ids"]:
         delete(user_id, field)
     set_photo_limit(user_id, 5)

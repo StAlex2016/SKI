@@ -904,6 +904,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     log_event("user_started", user_id=user.id, lang=lang)
     track(user.id, "start", lang=lang, username=user.username)
+    # Identify user in PostHog (traits update on every /start)
+    try:
+        from app.utils.posthog_client import identify as _ph_identify
+        _profile = get_user_profile(user.id) or {}
+        _ph_identify(user.id, {
+            "username": user.username,
+            "first_name": user.first_name,
+            "language_code": getattr(user, "language_code", None),
+            "lang": lang,
+            "athlete_name": _profile.get("athlete_name"),
+            "birth_year": _profile.get("birth_year"),
+            "category": _profile.get("category"),
+        })
+    except Exception:
+        pass
     save_user(telegram_user_id=user.id, username=user.username, first_name=user.first_name)
 
     await update.message.reply_text(
@@ -1581,10 +1596,35 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception:
                 pass
             track(user_id, "analysis_completed", mode="video", duration_sec=round(_dur_v, 2), score=_score_v, frames=len(frame_paths))
+            # Persist the analysis in DB so feedback can link to it
+            try:
+                _analysis_id_v = save_analysis(
+                    telegram_user_id=user_id,
+                    photos_count=len(frame_paths) + len(extra_urls or []),
+                    result_text=(analysis_text or "")[:500],
+                    status="success",
+                    score=_score_v,
+                    mode="video",
+                    discipline=discipline,
+                    lang=lang,
+                    run_date=run_date,
+                )
+                state.set_last_analysis_id(user_id, _analysis_id_v)
+            except Exception as _se:
+                logger.warning(f"video save_analysis failed: {_se}")
             pdf_path = await generate_pdf_detailed(user_id, pdf_data, lang=lang)
             with open(pdf_path, "rb") as pdf_file:
                 await context.bot.send_document(user_id, pdf_file)
             os.remove(pdf_path)
+            # Feedback prompt (like in photo flow)
+            await context.bot.send_message(
+                user_id,
+                t(lang, "rate"),
+                reply_markup=InlineKeyboardMarkup([[
+                    InlineKeyboardButton("👍", callback_data="fb_good"),
+                    InlineKeyboardButton("👎", callback_data="fb_bad"),
+                ]])
+            )
 
         except Exception as e:
             logger.exception(f"video_analysis_error {e}")
