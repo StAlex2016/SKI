@@ -6,6 +6,8 @@ compatible with pdf_detailed_service.build_html_detailed().
 import re
 from datetime import datetime
 
+from app.utils.text_utils import strip_frame_refs
+
 
 # ── SECTION HEADER DETECTION ───────────────────────────────────────────────────
 
@@ -174,8 +176,7 @@ def _strip_md(text: str) -> str:
 
 def _clean_str(text: str) -> str:
     """Strip frame refs, markdown bold, and replace long dashes."""
-    text = re.sub(r'\(кадр[ы]?\s*[\d,\s\u2013\-]+\)', '', str(text))
-    text = re.sub(r'\(frame[s]?\s*[\d,\s\u2013\-]+\)', '', text, flags=re.IGNORECASE)
+    text = strip_frame_refs(text)
     text = re.sub(r'\*{1,2}([^*]+)\*{1,2}', r'\1', text)
     text = text.replace(' — ', ' - ').replace('—', '-')
     return text.strip()

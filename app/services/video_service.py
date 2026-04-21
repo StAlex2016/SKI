@@ -166,6 +166,7 @@ _PROMPTS = {
 - Вместо конкретных возрастных групп пиши "для следующего уровня" или "более старшая возрастная группа"
 - Если фаза или элемент является одной из лучших в данном заезде, её НЕЛЬЗЯ описывать как "средняя потеря" или "основная зона потерь"
 - Сильная фаза = "минимальные потери" или "лучшая часть заезда", но НЕ "средняя потеря" и НЕ "высокая потеря"
+- КАДРЫ в user-facing секциях: в "ТОП-3 СИЛЬНЫХ СТОРОНЫ", "ТОП-3 ЗОНЫ РОСТА", "УПРАЖНЕНИЯ" и "ПОТЕНЦИАЛ" — НЕ ссылайся на номера кадров ("кадр 3", "на кадре 5", "frame 4"). Эти секции попадают в PDF, где самих кадров нет — ссылки сбивают с толку. Описывай наблюдение без привязки к индексу кадра. Упоминание номеров кадров допустимо ТОЛЬКО в разделах "АНАЛИЗ КАДРОВ" и "ТЕХНИЧЕСКИЙ РАЗБОР"
 - САМОПРОВЕРКА: перед выводом убедись что ни одна сильная сторона не противоречит зонам потерь
 
 ═══ ИТОГ ═══
@@ -323,6 +324,7 @@ _PROMPTS = {
 - Вместо конкретных возрастных групп пиши "для следующего уровня" или "более старшая возрастная группа"
 - Если фаза или элемент является одной из лучших в данном заезде, её НЕЛЬЗЯ описывать как "средняя потеря" или "основная зона потерь"
 - Сильная фаза = "минимальные потери" или "лучшая часть заезда", но НЕ "средняя потеря" и НЕ "высокая потеря"
+- КАДРЫ в user-facing секциях: в "ТОП-3 СИЛЬНЫХ СТОРОНЫ", "ТОП-3 ЗОНЫ РОСТА", "УПРАЖНЕНИЯ" и "ПОТЕНЦИАЛ" — НЕ ссылайся на номера кадров ("кадр 3", "на кадре 5", "frame 4"). Эти секции попадают в PDF, где самих кадров нет — ссылки сбивают с толку. Описывай наблюдение без привязки к индексу кадра. Упоминание номеров кадров допустимо ТОЛЬКО в разделах "АНАЛИЗ КАДРОВ" и "ТЕХНИЧЕСКИЙ РАЗБОР"
 - САМОПРОВЕРКА: перед выводом убедись что ни одна сильная сторона не противоречит зонам потерь
 
 ═══ ИТОГ ═══
@@ -476,6 +478,7 @@ INTEGRITY RULES (MANDATORY):
 - Instead of specific age groups write "for the next level" or "older age group"
 - If a phase or element is one of the best in this run, it CANNOT be described as "moderate loss" or "primary loss area"
 - Strong phase = "minimal losses" or "best part of the run", NOT "moderate loss" and NOT "high loss"
+- FRAMES in user-facing sections: in "STRENGTHS", "GROWTH AREAS", "DRILLS", and "POTENTIAL" — do NOT reference frame numbers ("frame 3", "on frame 5", "in frames 2-4"). These sections end up in a PDF where the frames themselves are not shown — references confuse the reader. Describe the observation without referencing frame indices. Frame numbers are allowed ONLY in "FRAME-BY-FRAME ANALYSIS" and "TECHNICAL BREAKDOWN" sections.
 - SELF-CHECK: before output verify that no strength contradicts a loss area
 
 ═══ SUMMARY ═══
@@ -633,6 +636,7 @@ INTEGRITY RULES (MANDATORY):
 - Instead of specific age groups write "for the next level" or "older age group"
 - If a phase or element is one of the best in this run, it CANNOT be described as "moderate loss" or "primary loss area"
 - Strong phase = "minimal losses" or "best part of the run", NOT "moderate loss" and NOT "high loss"
+- FRAMES in user-facing sections: in "STRENGTHS", "GROWTH AREAS", "DRILLS", and "POTENTIAL" — do NOT reference frame numbers ("frame 3", "on frame 5", "in frames 2-4"). These sections end up in a PDF where the frames themselves are not shown — references confuse the reader. Describe the observation without referencing frame indices. Frame numbers are allowed ONLY in "FRAME-BY-FRAME ANALYSIS" and "TECHNICAL BREAKDOWN" sections.
 - SELF-CHECK: before output verify that no strength contradicts a loss area
 
 ═══ SUMMARY ═══
@@ -785,6 +789,7 @@ OK to write: "above average for age", "developing ahead of typical", "creates a 
 - Вместо конкретных возрастных групп пиши "для следующего уровня" или "более старшая возрастная группа"
 - Если фаза или элемент является одной из лучших в данном заезде, её НЕЛЬЗЯ описывать как "средняя потеря" или "основная зона потерь"
 - Сильная фаза = "минимальные потери" или "лучшая часть заезда", но НЕ "средняя потеря" и НЕ "высокая потеря"
+- КАДРЫ в user-facing секциях: в "ТОП-3 СИЛЬНЫХ СТОРОНЫ", "ТОП-3 ЗОНЫ РОСТА", "УПРАЖНЕНИЯ" и "ПОТЕНЦИАЛ" — НЕ ссылайся на номера кадров ("кадр 3", "на кадре 5", "frame 4"). Эти секции попадают в PDF, где самих кадров нет — ссылки сбивают с толку. Описывай наблюдение без привязки к индексу кадра. Упоминание номеров кадров допустимо ТОЛЬКО в разделах "АНАЛИЗ КАДРОВ" и "ТЕХНИЧЕСКИЙ РАЗБОР"
 - САМОПРОВЕРКА: перед выводом убедись что ни одна сильная сторона не противоречит зонам потерь
 
 ═══ ИТОГ ═══
@@ -945,6 +950,7 @@ OK to write: "above average for age", "developing ahead of typical", "creates a 
 - Вместо конкретных возрастных групп пиши "для следующего уровня" или "более старшая возрастная группа"
 - Если фаза или элемент является одной из лучших в данном заезде, её НЕЛЬЗЯ описывать как "средняя потеря" или "основная зона потерь"
 - Сильная фаза = "минимальные потери" или "лучшая часть заезда", но НЕ "средняя потеря" и НЕ "высокая потеря"
+- КАДРЫ в user-facing секциях: в "ТОП-3 СИЛЬНЫХ СТОРОНЫ", "ТОП-3 ЗОНЫ РОСТА", "УПРАЖНЕНИЯ" и "ПОТЕНЦИАЛ" — НЕ ссылайся на номера кадров ("кадр 3", "на кадре 5", "frame 4"). Эти секции попадают в PDF, где самих кадров нет — ссылки сбивают с толку. Описывай наблюдение без привязки к индексу кадра. Упоминание номеров кадров допустимо ТОЛЬКО в разделах "АНАЛИЗ КАДРОВ" и "ТЕХНИЧЕСКИЙ РАЗБОР"
 - САМОПРОВЕРКА: перед выводом убедись что ни одна сильная сторона не противоречит зонам потерь
 
 ═══ ИТОГ ═══
@@ -1101,6 +1107,7 @@ INTEGRITY RULES (MANDATORY):
 - Instead of specific age groups write "for the next level" or "older age group"
 - If a phase or element is one of the best in this run, it CANNOT be described as "moderate loss" or "primary loss area"
 - Strong phase = "minimal losses" or "best part of the run", NOT "moderate loss" and NOT "high loss"
+- FRAMES in user-facing sections: in "STRENGTHS", "GROWTH AREAS", "DRILLS", and "POTENTIAL" — do NOT reference frame numbers ("frame 3", "on frame 5", "in frames 2-4"). These sections end up in a PDF where the frames themselves are not shown — references confuse the reader. Describe the observation without referencing frame indices. Frame numbers are allowed ONLY in "FRAME-BY-FRAME ANALYSIS" and "TECHNICAL BREAKDOWN" sections.
 - SELF-CHECK: before output verify that no strength contradicts a loss area
 
 ═══ SUMMARY ═══
@@ -1259,6 +1266,7 @@ INTEGRITY RULES (MANDATORY):
 - Instead of specific age groups write "for the next level" or "older age group"
 - If a phase or element is one of the best in this run, it CANNOT be described as "moderate loss" or "primary loss area"
 - Strong phase = "minimal losses" or "best part of the run", NOT "moderate loss" and NOT "high loss"
+- FRAMES in user-facing sections: in "STRENGTHS", "GROWTH AREAS", "DRILLS", and "POTENTIAL" — do NOT reference frame numbers ("frame 3", "on frame 5", "in frames 2-4"). These sections end up in a PDF where the frames themselves are not shown — references confuse the reader. Describe the observation without referencing frame indices. Frame numbers are allowed ONLY in "FRAME-BY-FRAME ANALYSIS" and "TECHNICAL BREAKDOWN" sections.
 - SELF-CHECK: before output verify that no strength contradicts a loss area
 
 ═══ SUMMARY ═══

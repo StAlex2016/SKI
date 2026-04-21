@@ -12,7 +12,7 @@ from html import escape
 
 from playwright.async_api import async_playwright
 
-from app.utils.text_utils import _clamp
+from app.utils.text_utils import _clamp, strip_frame_refs
 
 
 # ── BRANDING ──────────────────────────────────────────────────────────────────
@@ -127,8 +127,7 @@ def _color_dot(color: str) -> str:
 # ── TEXT HELPERS ──────────────────────────────────────────────────────────────
 
 def _clean(text: str) -> str:
-    text = re.sub(r'\(кадр[ы]?\s*[\d,\s\u2013\-]+\)', '', str(text))
-    text = re.sub(r'\(frame[s]?\s*[\d,\s\u2013\-]+\)', '', text, flags=re.IGNORECASE)
+    text = strip_frame_refs(text)
     text = re.sub(r'\*{1,2}([^*]+)\*{1,2}', r'\1', text)
     text = text.replace(' — ', ' - ').replace('—', '-')
     return text.strip()
@@ -323,9 +322,9 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
                 "name":        _clamp(n, _LIM["drill_name"], "word"),
                 "description": _clean(str(d.get("description", ""))),
                 "priority":    bool(d.get("priority", False)),
-                "action":      _clamp(str(d.get("action", "")).strip(), _LIM["drill_detail"], "sentence"),
-                "focus":       _clamp(str(d.get("focus", "")).strip(), _LIM["drill_detail"], "sentence"),
-                "success":     _clamp(str(d.get("success", "")).strip(), _LIM["drill_detail"], "sentence"),
+                "action":      _clamp(_clean(str(d.get("action", ""))), _LIM["drill_detail"], "sentence"),
+                "focus":       _clamp(_clean(str(d.get("focus", ""))), _LIM["drill_detail"], "sentence"),
+                "success":     _clamp(_clean(str(d.get("success", ""))), _LIM["drill_detail"], "sentence"),
             })
 
     lbl_run = L["run_race"] if run_type == "race" else L["run_training"]

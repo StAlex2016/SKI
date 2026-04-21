@@ -1,6 +1,6 @@
 import re
 
-from app.utils.text_utils import _clamp
+from app.utils.text_utils import _clamp, strip_frame_refs
 
 # === TELEGRAM TEXT LIMITS (chars) ===
 _TG = {
@@ -150,9 +150,8 @@ def _format_video(raw_text: str, lang: str, extra_data: dict | None = None) -> s
                 # Strip internal prompt markers
                 name = re.sub(r"\s*\(\s*(?:СТРОГО|STRICTLY)[^)]*\)", "", name, flags=re.I)
                 name = re.sub(r"\s*\(\s*(?:НЕ другая группа|NOT any other group)[^)]*\)", "", name, flags=re.I)
-                # Strip frame references
-                name = re.sub(r"\s*\(кадр.*$", "", name, flags=re.I)
-                name = re.sub(r"\s*\(frame.*$", "", name, flags=re.I)
+                # Strip all frame references (RU/EN, any grammatical form)
+                name = strip_frame_refs(name)
                 # Take text before first long dash explanation (but keep short dashes in names)
                 name = re.split(r"\s+[-–—]\s+", name, maxsplit=1)[0].strip()
                 name = _clamp(name, _TG["strength"], "sentence")
@@ -164,9 +163,8 @@ def _format_video(raw_text: str, lang: str, extra_data: dict | None = None) -> s
             m_num = re.match(r"^\d+[\.\)]\s*(.+)", line)
             if m_num and len(weaknesses) < 3:
                 name = re.sub(r"\*{1,2}", "", m_num.group(1)).strip()
-                # Strip trailing frame refs, scores, percentages
-                name = re.sub(r"\s*\(кадр.*$", "", name, flags=re.I)
-                name = re.sub(r"\s*\(frame.*$", "", name, flags=re.I)
+                # Strip frame refs (RU/EN), then stray percentages
+                name = strip_frame_refs(name)
                 name = re.sub(r",?\s*[≈~]?\d+[–-]\d+%.*$", "", name)
                 name = _clamp(name, _TG["weakness"], "sentence")
                 weaknesses.append(f"• {name}")
@@ -177,8 +175,7 @@ def _format_video(raw_text: str, lang: str, extra_data: dict | None = None) -> s
             m_num = re.match(r"^\d+[\.\)]\s*(.+)", line)
             if m_num and len(drills) < 3:
                 name = re.sub(r"\*{1,2}", "", m_num.group(1)).strip()
-                name = re.sub(r"\s*\(кадр.*$", "", name, flags=re.I)
-                name = re.sub(r"\s*\(frame.*$", "", name, flags=re.I)
+                name = strip_frame_refs(name)
                 name = _clamp(name, _TG["drill"], "word")
                 drills.append(f"• {name}")
             continue
