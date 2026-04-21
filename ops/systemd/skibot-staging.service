@@ -8,7 +8,7 @@ Type=simple
 User=ubuntu
 Group=ubuntu
 # Separate working dir = separate PDFs, logs, Playwright cache under /var/lib/skibot/staging
-WorkingDirectory=/var/lib/skibot/staging
+WorkingDirectory=/home/ubuntu/ski-mvp-bot
 EnvironmentFile=/home/ubuntu/ski-mvp-bot/.env.staging
 # Same venv as prod is fine — deps identical; no need to duplicate Chromium
 ExecStart=/home/ubuntu/ski-mvp-bot/venv/bin/python -m app.main
