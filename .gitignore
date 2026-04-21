@@ -1,6 +1,8 @@
 # ─── Secrets ──────────────────────────────────────────────────────────
 .env
 .env.*
+# Allow committed env templates (no real secrets — just <PLACEHOLDERS>)
+!ops/env/.env.*.example
 
 # ─── Python ───────────────────────────────────────────────────────────
 __pycache__/
@@ -14,6 +16,8 @@ __pycache__/
 # ─── Virtual env ──────────────────────────────────────────────────────
 venv/
 env/
+# Exception: ops/env/ contains committed env-file templates, not a virtualenv
+!ops/env/
 .venv/
 
 # ─── IDE ──────────────────────────────────────────────────────────────

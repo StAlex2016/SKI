@@ -1,0 +1,10 @@
+[Unit]
+Description=Skibot PROD cleanup — every hour
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1h
+Unit=skibot-cleanup-prod.service
+
+[Install]
+WantedBy=timers.target

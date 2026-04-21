@@ -28,16 +28,26 @@ def _init():
         logger.warning(f"PostHog init failed: {e}")
 
 
+def _env_tag() -> str:
+    return os.getenv("APP_ENV", "prod").strip().lower() or "prod"
+
+
 def capture(distinct_id, event: str, properties: dict = None):
-    """Send a single event to PostHog. Silent on any failure."""
+    """Send a single event to PostHog. Silent on any failure.
+
+    Every event is tagged with `env` (prod/staging) so staging traffic
+    can be filtered out of product dashboards.
+    """
     _init()
     if not _enabled or _client is None:
         return
     try:
+        props = dict(properties or {})
+        props.setdefault("env", _env_tag())
         _client.capture(
             distinct_id=str(distinct_id) if distinct_id is not None else "system",
             event=event,
-            properties=properties or {},
+            properties=props,
         )
     except Exception as e:
         logger.debug(f"PostHog capture failed: {e}")
@@ -49,9 +59,11 @@ def identify(distinct_id, properties: dict = None):
     if not _enabled or _client is None:
         return
     try:
+        props = dict(properties or {})
+        props.setdefault("env", _env_tag())
         _client.identify(
             distinct_id=str(distinct_id),
-            properties=properties or {},
+            properties=props,
         )
     except Exception as e:
         logger.debug(f"PostHog identify failed: {e}")

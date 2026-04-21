@@ -1,0 +1,11 @@
+[Unit]
+Description=Skibot STAGING cleanup — every hour (only runs when skibot-staging is active)
+Requires=skibot-staging.service
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1h
+Unit=skibot-cleanup-staging.service
+
+[Install]
+WantedBy=timers.target

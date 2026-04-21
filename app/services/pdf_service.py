@@ -1,3 +1,4 @@
+import os
 import re
 from datetime import datetime
 from html import escape
@@ -491,7 +492,7 @@ body{{
 
 async def generate_pdf(user_id: int, text: str, lang: str = "ru", run_date: str = None, report_date: str = None) -> str:
     html = build_html(text, lang, run_date=run_date, report_date=report_date)
-    filename = f"report_{user_id}.pdf"
+    filename = os.path.join(os.getenv("OUTPUT_DIR", "."), f"report_{user_id}.pdf")
 
     async with async_playwright() as p:
         browser = await p.chromium.launch()

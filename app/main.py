@@ -13,7 +13,14 @@ from telegram.ext import (
     filters
 )
 
-from app.config import BOT_TOKEN, OPENAI_API_KEY
+from app.config import (
+    BOT_TOKEN,
+    OPENAI_API_KEY,
+    ALLOWED_USER_IDS as ALLOWED_USERS,
+    OWNER_ID,
+    APP_ENV,
+    TMP_DIR,
+)
 from app.db import init_db
 from app.services.openai_service import analyze_images, check_images_quality
 from app.services.pdf_service import generate_pdf
@@ -44,8 +51,8 @@ from app.repositories import (
 )
 import app.state as state
 
-ALLOWED_USERS = [202921941, 201955370]
-OWNER_ID = int(os.getenv("OWNER_ID", str(ALLOWED_USERS[0])))  # admin receives reports + alerts
+# ALLOWED_USERS / OWNER_ID come from app.config (env-driven, see ALLOWED_USER_IDS / OWNER_ID)
+_STAGING_PREFIX = "🛠️ <b>[STAGING]</b>\n\n" if APP_ENV == "staging" else ""
 from datetime import datetime, time as _dtime, timedelta
 try:
     from zoneinfo import ZoneInfo
@@ -922,7 +929,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_user(telegram_user_id=user.id, username=user.username, first_name=user.first_name)
 
     await update.message.reply_text(
-        t(lang, "welcome"),
+        _STAGING_PREFIX + t(lang, "welcome"),
         reply_markup=keyboard_mode(lang),
         parse_mode="HTML"
     )
@@ -1724,7 +1731,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(t(lang, "video_too_long"))
         return
 
-    tmp_path = f"/tmp/skibot_{user_id}.mp4"
+    tmp_path = os.path.join(TMP_DIR, f"skibot_{user_id}.mp4")
     try:
         tg_file = await context.bot.get_file(video.file_id)
         await tg_file.download_to_drive(tmp_path)

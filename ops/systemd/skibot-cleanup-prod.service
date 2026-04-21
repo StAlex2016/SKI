@@ -1,0 +1,9 @@
+[Unit]
+Description=Skibot PROD — hourly PDF/tmp cleanup
+
+[Service]
+Type=oneshot
+User=ubuntu
+# Only touch prod output dir — NEVER /var/lib/skibot/staging
+ExecStart=/usr/bin/find /home/ubuntu/ski-mvp-bot -maxdepth 1 -name 'report_*.pdf' -mmin +60 -delete
+ExecStart=/usr/bin/find /tmp -maxdepth 1 -name 'skibot_*.mp4' -mmin +60 -delete

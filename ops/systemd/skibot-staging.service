@@ -1,0 +1,27 @@
+[Unit]
+Description=Ski MVP Telegram Bot — STAGING (on-demand)
+After=network.target postgresql.service redis-server.service
+Wants=postgresql.service redis-server.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+# Separate working dir = separate PDFs, logs, Playwright cache under /var/lib/skibot/staging
+WorkingDirectory=/var/lib/skibot/staging
+EnvironmentFile=/home/ubuntu/ski-mvp-bot/.env.staging
+# Same venv as prod is fine — deps identical; no need to duplicate Chromium
+ExecStart=/home/ubuntu/ski-mvp-bot/venv/bin/python -m app.main
+Restart=on-failure
+RestartSec=10
+
+# Tighter caps: staging must not starve prod
+MemoryMax=800M
+CPUQuota=100%
+TasksMax=256
+
+NoNewPrivileges=true
+PrivateTmp=false
+
+[Install]
+# NOT WantedBy=multi-user.target — staging is on-demand (systemctl start/stop)

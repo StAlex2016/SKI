@@ -1,0 +1,10 @@
+[Unit]
+Description=Skibot PROD — nightly pg_dump
+
+[Service]
+Type=oneshot
+User=ubuntu
+Environment=ENV_FILE=/home/ubuntu/ski-mvp-bot/.env.prod
+Environment=BACKUP_DIR=/home/ubuntu/backups
+Environment=BACKUP_PREFIX=skibot
+ExecStart=/bin/bash /home/ubuntu/ski-mvp-bot/scripts/backup_db.sh

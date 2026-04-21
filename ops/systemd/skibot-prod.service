@@ -1,0 +1,25 @@
+[Unit]
+Description=Ski MVP Telegram Bot — PROD
+After=network.target postgresql.service redis-server.service
+Wants=postgresql.service redis-server.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/ski-mvp-bot
+EnvironmentFile=/home/ubuntu/ski-mvp-bot/.env.prod
+ExecStart=/home/ubuntu/ski-mvp-bot/venv/bin/python -m app.main
+Restart=always
+RestartSec=10
+
+# Resource caps (safety net against runaway memory / CPU)
+MemoryMax=1500M
+CPUQuota=200%
+
+# Hardening (optional, keep conservative)
+NoNewPrivileges=true
+PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target

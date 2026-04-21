@@ -800,7 +800,7 @@ body{{font-family:Arial,Helvetica,sans-serif;margin:0;width:595px;
 async def generate_pdf_detailed(user_id: int, data: dict, lang: str = "ru") -> str:
     """Render 3-page A4 analysis report -> PDF. Returns file path."""
     html     = build_html_detailed(data, lang)
-    filename = f"report_detailed_{user_id}_{int(time.time())}.pdf"
+    filename = os.path.join(os.getenv("OUTPUT_DIR", "."), f"report_detailed_{user_id}_{int(time.time())}.pdf")
 
     async with async_playwright() as p:
         browser = await p.chromium.launch()

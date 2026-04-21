@@ -12,7 +12,7 @@ import redis
 _r = redis.Redis(
     host=os.getenv("REDIS_HOST", "localhost"),
     port=int(os.getenv("REDIS_PORT", 6379)),
-    db=0,
+    db=int(os.getenv("REDIS_DB", 0)),  # 0=prod, 1=staging — full isolation via Redis logical DB
     decode_responses=True,
 )
 
