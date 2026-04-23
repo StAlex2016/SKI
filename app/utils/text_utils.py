@@ -64,6 +64,31 @@ def strip_frame_refs(text: str) -> str:
     return s.strip(" .,;:-—–")
 
 
+# Trailing conjunctions/prepositions that dangle when truncation cuts mid-thought.
+# GPT output often lands word-boundary cuts exactly on these, producing fragments
+# like "...проходить на ближней дистанции и" — strip the trailing dangler and
+# append ellipsis so the reader sees it was cut.
+_DANGLERS = frozenset({
+    # RU conjunctions & common prepositions
+    "и", "а", "но", "или", "также", "либо", "то",
+    "при", "на", "с", "со", "в", "во", "у", "из", "к", "ко", "от", "для",
+    "по", "о", "об", "до", "за", "над", "под", "без", "через", "про",
+    "перед", "между",
+    # EN counterparts
+    "and", "or", "but", "in", "on", "at", "by", "to", "for",
+    "with", "from", "of", "the", "a", "an",
+})
+
+
+def _strip_trailing_dangler(text: str) -> str:
+    """Remove trailing conjunction/preposition left over from word-boundary cut."""
+    stripped = text.rstrip(" .,;:-—–")
+    parts = stripped.rsplit(" ", 1)
+    if len(parts) == 2 and parts[1].lower() in _DANGLERS:
+        return parts[0].rstrip(" .,;:-—–")
+    return stripped
+
+
 def _clamp(text: str, max_chars: int, by: str = "sentence") -> str:
     """Smart text truncation that never cuts mid-word.
 
@@ -92,8 +117,13 @@ def _clamp(text: str, max_chars: int, by: str = "sentence") -> str:
         for sep, min_frac in (("\u2026", 0.5), (". ", 0.5), ("; ", 0.5), (", ", 0.8)):
             idx = text.rfind(sep, 0, max_chars)
             if idx > int(max_chars * min_frac):
+                # Clean sentence/clause boundary — no ellipsis needed
                 return text[: idx + 1].strip().rstrip(",;:")
-    # fallback: word boundary
+    # Fallback: word boundary. This IS a mid-thought cut — drop dangling
+    # connector/preposition and mark with an ellipsis so the reader knows.
     idx = text.rfind(" ", 0, max_chars)
-    cut = text[:idx].strip() if idx > 0 else text[:max_chars].strip()
-    return cut.rstrip(",;:")
+    cut = text[:idx] if idx > 0 else text[:max_chars]
+    cut = _strip_trailing_dangler(cut)
+    if cut and not cut.endswith(("…", "...")):
+        cut = cut + "\u2026"
+    return cut
