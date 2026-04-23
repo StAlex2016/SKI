@@ -91,8 +91,8 @@ _I18N = {
 
 # === TEXT LIMITS (chars) — clamp data BEFORE rendering ===
 _LIM = {
-    "str_p1": 120,
-    "weak_p1": 120,
+    "str_p1": 220,
+    "weak_p1": 220,
     "phase_body": 160,
     "drill_name": 60,
     "drill_detail": 140,
@@ -555,10 +555,12 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
             out += f'<div style="color:#bbb;font-size:11px;">&mdash;</div>'
         else:
             for j, item in enumerate(display):
+                # Font dropped 11→10 and line-height 1.4→1.35 so that full
+                # GPT-sized bullets (~200 chars) fit in 4 lines without clipping.
                 out += (
-                    f'<div style="padding:8px 8px;border-left:2px solid {col};'
-                    f'margin-bottom:6px;overflow:hidden;">'
-                    f'<div style="font-size:11px;color:{BODY};line-height:1.4;">'
+                    f'<div style="padding:6px 8px;border-left:2px solid {col};'
+                    f'margin-bottom:4px;overflow:hidden;">'
+                    f'<div style="font-size:10px;color:{BODY};line-height:1.35;">'
                     f'{escape(item)}</div>'
                     f'</div>'
                 )
