@@ -81,12 +81,19 @@ def _clamp(text: str, max_chars: int, by: str = "sentence") -> str:
         if before:
             return before
     if len(text) <= max_chars:
-        return text
+        # No clamp needed, but still normalise trailing connector punctuation
+        return text.rstrip().rstrip(",;:")
     if by == "sentence":
-        for sep in [". ", "; ", ", "]:
+        # Prefer full-sentence boundary. Comma is last-resort and only if it
+        # falls close to the limit — otherwise we cut mid-thought (e.g. the
+        # drill step "... концентрироваться на том," breaks off at pos ~50 of
+        # 140, leaving a meaningless fragment).
+        # sep -> minimum position to accept (as fraction of max_chars)
+        for sep, min_frac in (("\u2026", 0.5), (". ", 0.5), ("; ", 0.5), (", ", 0.8)):
             idx = text.rfind(sep, 0, max_chars)
-            if idx > max_chars // 3:
-                return text[: idx + 1].strip()
+            if idx > int(max_chars * min_frac):
+                return text[: idx + 1].strip().rstrip(",;:")
     # fallback: word boundary
     idx = text.rfind(" ", 0, max_chars)
-    return text[:idx].strip() if idx > 0 else text[:max_chars].strip()
+    cut = text[:idx].strip() if idx > 0 else text[:max_chars].strip()
+    return cut.rstrip(",;:")

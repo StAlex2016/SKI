@@ -133,6 +133,27 @@ def _clean(text: str) -> str:
     return text.strip()
 
 
+_CATEGORY_TIERS = ("U8", "U10", "U12", "U14", "U16", "U18")
+
+
+def _normalize_category(text: str, target: str) -> str:
+    """Replace any wrong U-tier mention with the user's actual category.
+
+    The LLM sometimes hallucinates "U12" even when the prompt explicitly
+    says "ONLY use {category}" — this is the final guard before render.
+    """
+    if not text or not target:
+        return text
+    tgt = target.strip().upper()
+    if tgt not in _CATEGORY_TIERS:
+        return text
+    for tier in _CATEGORY_TIERS:
+        if tier == tgt:
+            continue
+        text = re.sub(rf"\b{tier}\b", tgt, text, flags=re.IGNORECASE)
+    return text
+
+
 def _clean_confidence(text: str) -> str:
     """Strip confidence markers and emoji from text."""
     text = re.sub(r'\s*\([\U0001F534\U0001F7E1\U0001F7E2\U0001F7E0][^)]*\)\s*', '', text)
@@ -194,7 +215,9 @@ def _build_radar_svg(radar: dict, lang: str) -> str:
             f'justify-content:center;color:{MUTED};font-size:13px;">{no_data}</div>'
         )
 
-    W, H = 230, 200
+    # W widened from 230 so long labels (e.g. "Кантование" at anchor=start on
+    # the right) fit inside viewBox instead of getting clipped at ~"Кантован".
+    W, H = 270, 200
     cx, cy = W / 2, H / 2 - 2
     R = 68  # max radius
     n = 6
@@ -267,13 +290,32 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
     run_type   = str(data.get("run_type", "training"))
     ph_scores  = data.get("phase_scores", {})
     radar      = data.get("radar", {})
-    strengths  = [_clean(str(s.get("text", s) if isinstance(s, dict) else s))
-                  for s in data.get("strengths", [])]
-    weaknesses = [_clean_confidence(_clean(str(s.get("text", s) if isinstance(s, dict) else s)))
-                  for s in data.get("weaknesses", [])]
+    strengths  = [
+        _clamp(
+            _normalize_category(
+                _clean(str(s.get("text", s) if isinstance(s, dict) else s)),
+                category,
+            ),
+            _LIM["str_p1"], "sentence",
+        )
+        for s in data.get("strengths", [])
+    ]
+    weaknesses = [
+        _clamp(
+            _normalize_category(
+                _clean_confidence(_clean(str(s.get("text", s) if isinstance(s, dict) else s))),
+                category,
+            ),
+            _LIM["weak_p1"], "sentence",
+        )
+        for s in data.get("weaknesses", [])
+    ]
     phases_raw = data.get("phases", [])
     drills_raw = data.get("drills", [])
-    potential_raw = _clean(str(data.get("potential", "-")))
+    potential_raw = _normalize_category(
+        _clean(str(data.get("potential", "-"))),
+        category,
+    )
     potential = "\n".join(
         _clamp(line, _LIM["potential"], "sentence")
         for line in potential_raw.split("\n") if line.strip()
@@ -561,7 +603,13 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
 
         ph_obs = ""
         if ph is not None:
-            ph_obs = _clamp(_clean(str(ph.get("observation", ""))), _LIM["phase_body"], "sentence")
+            ph_obs = _clamp(
+                _normalize_category(
+                    _clean(str(ph.get("observation", ""))),
+                    category,
+                ),
+                _LIM["phase_body"], "sentence",
+            )
 
         border_col = _sc(ph_sc)
         t_bg, t_fg = _badge_bg(ph_sc)

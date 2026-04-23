@@ -346,6 +346,17 @@ def parse_video_analysis(
                     r"phase\s*:\s*\w+|фаза\s*:\s*\w+|\d+\s*/\s*10",
                     "", line, flags=re.I,
                 )
+                # Strip parenthesised header residue like "(Вход в ворота, )"
+                # left over when GPT writes pure headers
+                # "**Frame 1 (Вход в ворота, 7/10):**" with no observation on
+                # the same line. Without this, the phase label itself would be
+                # stored as the observation.
+                clean = re.sub(
+                    r"\(\s*(?:вход(?:\s+в\s+ворота)?|апекс|выход|переход|"
+                    r"entry|apex|exit|transition|смена\s+канта|edge\s+change)"
+                    r"[^)]*\)",
+                    "", clean, flags=re.I,
+                )
                 clean = re.sub(r"[\-–:*]+", " ", clean).strip()
                 if len(clean) > 10:
                     fd["obs"] = clean
