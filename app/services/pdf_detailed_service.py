@@ -154,16 +154,18 @@ def _normalize_category(text: str, target: str) -> str:
 
     The LLM sometimes hallucinates "U12" even when the prompt explicitly
     says "ONLY use {category}" — this is the final guard before render.
+    Also handles non-U-tier targets like "Adult" by replacing every U-tier
+    with the target string (previous implementation silently passed those
+    through unchanged, so "U12" still leaked into adult reports).
     """
     if not text or not target:
         return text
-    tgt = target.strip().upper()
-    if tgt not in _CATEGORY_TIERS:
-        return text
+    tgt = target.strip()
+    replacement = tgt.upper() if tgt.upper() in _CATEGORY_TIERS else tgt
     for tier in _CATEGORY_TIERS:
-        if tier == tgt:
+        if tier == replacement:
             continue
-        text = re.sub(rf"\b{tier}\b", tgt, text, flags=re.IGNORECASE)
+        text = re.sub(rf"\b{tier}\b", replacement, text, flags=re.IGNORECASE)
     return text
 
 
