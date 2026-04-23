@@ -50,9 +50,16 @@ _I18N = {
         "loss_priority": "приоритет",
         "ph_at_entry": "входе", "ph_at_apex": "апексе", "ph_at_exit": "выходе", "ph_at_transition": "переходе",
         "bar_exit": "Выход из поворота", "bar_neutral": "Нейтральная фаза", "bar_apex": "Апекс (карвинг)",
-        "bar_exit_sub": "Поздний вылет, ЦТ назад - основная потеря заезда",
+        # Subtitles describe the CAUSE; severity tag ("основная потеря заезда"
+        # etc.) is appended dynamically based on actual scores in render loop.
+        "bar_exit_sub": "Поздний вылет, ЦТ назад",
         "bar_neutral_sub": "Время без давления на лыжи между воротами",
-        "bar_apex_sub": "Чистый карвинг - нет потерь, лучшее место заезда",
+        "bar_apex_sub": "Ведение лыж на канте",
+        # Dynamic severity tags (appended to subtitles in render loop)
+        "tag_main_loss":  "основная потеря заезда",
+        "tag_minor":      "минимальные потери",
+        "tag_apex_best":  "нет потерь, лучшее место заезда",
+        "tag_apex_weak":  "точка роста - теряется контакт с кантом",
         "speed_pct": "скорость", "tech_pct": "техника",
         "drill_action": "Что делать", "drill_focus": "Фокус", "drill_success": "Успех",
         "no_data": "Нет данных",
@@ -78,9 +85,13 @@ _I18N = {
         "loss_priority": "priority",
         "ph_at_entry": "entry", "ph_at_apex": "apex", "ph_at_exit": "exit", "ph_at_transition": "transition",
         "bar_exit": "Turn exit", "bar_neutral": "Neutral phase", "bar_apex": "Apex (carving)",
-        "bar_exit_sub": "Late exit, CoM back - main speed loss",
+        "bar_exit_sub": "Late exit, CoM back",
         "bar_neutral_sub": "Time without ski pressure between gates",
-        "bar_apex_sub": "Clean carving - no losses, best part of run",
+        "bar_apex_sub": "Ski steered on edge",
+        "tag_main_loss":  "main speed loss",
+        "tag_minor":      "minimal loss",
+        "tag_apex_best":  "no losses, best part of run",
+        "tag_apex_weak":  "growth area - edge contact lost",
         "speed_pct": "speed", "tech_pct": "technique",
         "drill_action": "Action", "drill_focus": "Focus", "drill_success": "Success",
         "no_data": "No data",
@@ -666,19 +677,51 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
     _neut_lbl, _   = _loss_label(trans_v)
     _apex_lbl, _   = _eff_label(apex_v)
 
+    # ── Dynamic severity tags for subtitles ────────────────────────────────
+    # Rule: add "основная потеря заезда" ONLY to the phase that is BOTH
+    #   (a) the worst-scoring loss phase, AND
+    #   (b) absolutely bad (score < 7.0 → high-loss category).
+    # "минимальные потери" only when score >= 8.5 (matches loss_min threshold).
+    # Otherwise no tag — the right-side label + dot already convey severity,
+    # adding a contradictory tag like "минимальная потеря" to an 8.0 score
+    # (labelled "средняя потеря" orange) just confused readers.
+    def _loss_tag(score: float, is_worst_loss: bool) -> str:
+        if is_worst_loss and score < 7.0:
+            return L["tag_main_loss"]
+        if score >= 8.5:
+            return L["tag_minor"]
+        return ""
+
+    # Worst of exit vs transition = lower score
+    worst_is_exit  = exit_v < trans_v
+    worst_is_trans = trans_v < exit_v
+    exit_tag = _loss_tag(exit_v,  worst_is_exit)
+    neut_tag = _loss_tag(trans_v, worst_is_trans)
+
+    # Apex is an efficiency phase, not a loss phase — only tag extremes
+    if apex_v >= 8.5:
+        apex_tag = L["tag_apex_best"]
+    elif apex_v < 7.0:
+        apex_tag = L["tag_apex_weak"]
+    else:
+        apex_tag = ""
+
+    def _sub(base: str, tag: str) -> str:
+        return f"{base} - {tag}" if tag else base
+
     speed_bars = (
         f'<div style="padding:16px 20px;border-top:1px solid #e2e8f0;flex:none;margin-top:auto;">'
         f'<div style="font-size:12px;font-weight:700;color:{NAVY};text-transform:uppercase;'
         f'letter-spacing:0.5px;margin-bottom:14px;">{L["speed_loss_title"]}</div>'
         + _speed_bar(L["bar_exit"],
                      f"{_loss_dot(exit_v)} {_exit_lbl}", exit_bar_w,
-                     L["bar_exit_sub"], False)
+                     _sub(L["bar_exit_sub"], exit_tag), False)
         + _speed_bar(L["bar_neutral"],
                      f"{_loss_dot(trans_v)} {_neut_lbl}", neutral_bar_w,
-                     L["bar_neutral_sub"], False)
+                     _sub(L["bar_neutral_sub"], neut_tag), False)
         + _speed_bar(L["bar_apex"],
                      f"{_loss_dot(apex_v)} {_apex_lbl}", apex_bar_w,
-                     L["bar_apex_sub"], True, last=True)
+                     _sub(L["bar_apex_sub"], apex_tag), True, last=True)
         + '</div>'
     )
 
