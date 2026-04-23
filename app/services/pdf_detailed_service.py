@@ -47,6 +47,7 @@ _I18N = {
         "ph_entry": "Вход", "ph_apex": "Апекс", "ph_exit": "Выход", "ph_transition": "Переход",
         "loss_min": "минимальная потеря", "loss_med": "средняя потеря", "loss_high": "высокая потеря",
         "eff_high": "высокая эффективность", "eff_med": "средняя эффективность",
+        "eff_low":  "низкая эффективность",
         "loss_priority": "приоритет",
         "ph_at_entry": "входе", "ph_at_apex": "апексе", "ph_at_exit": "выходе", "ph_at_transition": "переходе",
         "bar_exit": "Выход из поворота", "bar_neutral": "Нейтральная фаза", "bar_apex": "Апекс (карвинг)",
@@ -82,6 +83,7 @@ _I18N = {
         "ph_entry": "Entry", "ph_apex": "Apex", "ph_exit": "Exit", "ph_transition": "Transition",
         "loss_min": "minimal loss", "loss_med": "moderate loss", "loss_high": "high loss",
         "eff_high": "high efficiency", "eff_med": "moderate efficiency",
+        "eff_low":  "low efficiency",
         "loss_priority": "priority",
         "ph_at_entry": "entry", "ph_at_apex": "apex", "ph_at_exit": "exit", "ph_at_transition": "transition",
         "bar_exit": "Turn exit", "bar_neutral": "Neutral phase", "bar_apex": "Apex (carving)",
@@ -176,9 +178,20 @@ def _clean_confidence(text: str) -> str:
     return text.strip().rstrip('.,;')
 
 
+# Unified score thresholds used everywhere colour is assigned
+# (border, text, badge bg, loss label, loss dot, efficiency label).
+# Single source of truth — previously _sc / _badge_bg / _loss_label each used
+# its own numbers and the visual signals contradicted each other.
+SCORE_GREEN_MIN  = 8.5   # >= green  — excellent / minimal loss / high efficiency
+SCORE_ORANGE_MIN = 7.0   # >= orange — medium
+# below 7.0                        — red      — high loss / growth priority
+
+
 def _sc(v: float) -> str:
-    """Score -> color."""
-    return GREEN if v >= 8 else (ORANGE if v >= 6.5 else RED)
+    """Score -> colour (border / text)."""
+    if v >= SCORE_GREEN_MIN:  return GREEN
+    if v >= SCORE_ORANGE_MIN: return ORANGE
+    return RED
 
 
 # ── WEIGHTS ───────────────────────────────────────────────────────────────────
@@ -349,20 +362,12 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
         score_val = 7.5
     score_pct = max(0, min(100, int(round(score_val * 10))))
 
-    # Normalize phases
+    # Normalize phases. When Exit-phase data is missing we previously
+    # synthesized it from `weaknesses[0]`, which could be a weakness about a
+    # completely different phase — misleading. Now leave missing phases as
+    # None and let the renderer show "—" for an honest gap.
     _ph_by_type = {str(p.get("phase", "")): p for p in phases_raw}
     phases: list[dict | None] = [_ph_by_type.get(pt) for pt in _PHASE_ORDER]
-
-    if phases[2] is None:
-        exit_obs = weaknesses[0] if weaknesses else "-"
-        try:
-            exit_sc_val = float(ph_scores.get("exit", 7.5))
-        except Exception:
-            exit_sc_val = 7.5
-        phases[2] = {
-            "phase": "Exit", "score": exit_sc_val,
-            "observation": exit_obs, "frame_path": None,
-        }
 
     # Deduplicate drills
     seen: set[str] = set()
@@ -392,37 +397,42 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
         except Exception:
             pass
 
-    entry_v = ph_flt.get("entry",      7.5)
-    apex_v  = ph_flt.get("apex",       7.5)
-    exit_v  = ph_flt.get("exit",       7.5)
-    trans_v = ph_flt.get("transition", 7.5)
+    # Missing phase scores are left as None (parser change) so the PDF can
+    # honestly show "—" instead of a fake middling 7.5 that looked like real
+    # data. Downstream helpers check for None and skip / placeholder.
+    entry_v = ph_flt.get("entry")
+    apex_v  = ph_flt.get("apex")
+    exit_v  = ph_flt.get("exit")
+    trans_v = ph_flt.get("transition")
 
-    # Speed loss calculations
-    exit_loss    = round((10 - exit_v)  * 8)
-    neutral_loss = round((10 - trans_v) * 5)
-    apex_eff     = round(apex_v * 10)
+    # Bar widths for "Где теряется скорость" — unified scale (was three
+    # different multipliers before, so equal loss showed unequal bars).
+    # loss bar grows with gap from 10, efficiency bar grows with score.
+    def _loss_bar_w(score: float) -> int:
+        return max(10, min(95, int(round((10 - score) * 10))))
+
+    def _eff_bar_w(score: float) -> int:
+        return max(10, min(95, int(round(score * 10))))
 
     def _loss_label(score: float) -> tuple[str, str]:
-        if score >= 8.5:
-            return (L["loss_min"], "#4CAF50")
-        if score >= 7.0:
-            return (L["loss_med"], "#FF9800")
+        if score >= SCORE_GREEN_MIN:  return (L["loss_min"],  "#4CAF50")
+        if score >= SCORE_ORANGE_MIN: return (L["loss_med"],  "#FF9800")
         return (L["loss_high"], "#F44336")
 
     def _loss_dot(score: float) -> str:
-        if score >= 8.5: return _color_dot("green")
-        if score >= 7.0: return _color_dot("orange")
+        if score >= SCORE_GREEN_MIN:  return _color_dot("green")
+        if score >= SCORE_ORANGE_MIN: return _color_dot("orange")
         return _color_dot("red")
 
     def _eff_label(score: float) -> tuple[str, str]:
-        if score >= 8.5:
-            return (L["eff_high"], "#4CAF50")
-        return (L["eff_med"], "#FF9800")
+        if score >= SCORE_GREEN_MIN:  return (L["eff_high"], "#4CAF50")
+        if score >= SCORE_ORANGE_MIN: return (L["eff_med"],  "#FF9800")
+        return (L["eff_low"], "#F44336")
 
     def _badge_bg(v: float) -> tuple[str, str]:
-        if v >= 8:   return ("#eaf3de", "#27500a")
-        if v >= 7:   return ("#faeeda", "#412402")
-        return ("#faece7", "#712b13")
+        if v >= SCORE_GREEN_MIN:  return ("#eaf3de", "#27500a")  # green
+        if v >= SCORE_ORANGE_MIN: return ("#faeeda", "#412402")  # orange
+        return ("#faece7", "#712b13")                            # red
 
     _PHASE_AT = {
         "entry": L["ph_at_entry"], "apex": L["ph_at_apex"],
@@ -520,14 +530,19 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
     ]
     phase_cards_html = ""
     for i, (lbl, val) in enumerate(kpi_items):
-        col = _sc(val)
+        if val is None:
+            col = MUTED
+            val_html = "&mdash;"
+        else:
+            col = _sc(val)
+            val_html = f"{val:.1f}"
         phase_cards_html += (
             f'<div style="flex:1;min-width:45%;background:#f8fafc;border-radius:6px;'
             f'padding:8px 10px;display:flex;flex-direction:column;align-items:center;'
             f'justify-content:center;">'
             f'<div style="font-size:10px;color:{LABEL_C};text-transform:uppercase;'
             f'letter-spacing:0.5px;margin-bottom:3px;">{lbl}</div>'
-            f'<div style="font-size:24px;font-weight:900;color:{col};line-height:1;">{val:.1f}</div>'
+            f'<div style="font-size:24px;font-weight:900;color:{col};line-height:1;">{val_html}</div>'
             f'</div>'
         )
 
@@ -598,7 +613,9 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
         f'</div>'
     )
 
-    # 4 phase cards (no photos)
+    # 4 phase cards (no photos). If a phase has neither parser-derived card
+    # nor a phase_scores entry, render a placeholder card so the 4-up grid
+    # stays visually consistent rather than collapsing or faking a number.
     phase_blocks = ""
     for idx, ph in enumerate(phases):
         pt = _PHASE_ORDER[idx]
@@ -606,13 +623,11 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
         ph_sub  = _PHASE_SUB_EN[pt] if lang == "en" else _PHASE_SUB_RU[pt]
         bb = "border-bottom:0.5px solid #e2e8f0;" if idx < 3 else ""
 
-        if ph is None:
-            ph_sc = ph_flt.get(pt.lower(), 7.5)
-        else:
-            try:
-                ph_sc = float(ph.get("score", 7.5))
-            except Exception:
-                ph_sc = 7.5
+        raw_sc = ph_flt.get(pt.lower()) if ph is None else ph.get("score")
+        try:
+            ph_sc = float(raw_sc) if raw_sc is not None else None
+        except Exception:
+            ph_sc = None
 
         ph_obs = ""
         if ph is not None:
@@ -624,13 +639,30 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
                 _LIM["phase_body"], "sentence",
             )
 
-        border_col = _sc(ph_sc)
-        t_bg, t_fg = _badge_bg(ph_sc)
-        t_sc = min(10.0, ph_sc + (sw / 100))
-        s_sc = max(0.0, ph_sc - (sw / 100))
-
-        # Issue text
-        issue_text = _auto_issue(pt.lower(), ph_sc)
+        # Colours degrade gracefully when no data
+        if ph_sc is None:
+            border_col = "#cfd4dc"
+            t_bg, t_fg = "#f0f4f8", MUTED
+        else:
+            border_col = _sc(ph_sc)
+            t_bg, t_fg = _badge_bg(ph_sc)
+        # T/S sub-scores are a heuristic split of the single ph_sc, biased
+        # toward whichever dimension matters more for the athlete's age+run
+        # type. Previously T was always higher than S regardless of weighting,
+        # which contradicted the header for speed-dominant contexts (e.g.
+        # adult race, tw=25, sw=75). tech_bias is positive when technique
+        # dominates (young / training) and negative when speed does
+        # (older / race) — so the side that matters more renders higher.
+        tech_bias = (tw - sw) / 200.0
+        if ph_sc is None:
+            t_html = s_html = "&mdash;"
+            issue_text = f'<span style="color:{MUTED};">{L.get("no_data", "—")}</span>'
+        else:
+            t_sc = max(0.0, min(10.0, ph_sc + tech_bias))
+            s_sc = max(0.0, min(10.0, ph_sc - tech_bias))
+            t_html = f"{t_sc:.1f}"
+            s_html = f"{s_sc:.1f}"
+            issue_text = _auto_issue(pt.lower(), ph_sc)
 
         phase_blocks += (
             f'<div style="{bb}padding:10px 20px;flex-shrink:0;'
@@ -641,9 +673,9 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
             f'<span style="font-size:16px;font-weight:900;color:{NAVY};">{escape(ph_disp)}</span>'
             f'<div style="display:flex;gap:5px;flex-shrink:0;">'
             f'<span style="background:{t_bg};color:{t_fg};font-size:12px;font-weight:900;'
-            f'padding:3px 8px;border-radius:4px;">T {t_sc:.1f}</span>'
+            f'padding:3px 8px;border-radius:4px;">T {t_html}</span>'
             f'<span style="background:{t_bg};color:{t_fg};font-size:12px;font-weight:900;'
-            f'padding:3px 8px;border-radius:4px;">S {s_sc:.1f}</span>'
+            f'padding:3px 8px;border-radius:4px;">S {s_html}</span>'
             f'</div></div>'
             f'<div style="font-size:11px;color:{BODY};line-height:1.4;margin-bottom:4px;'
             f'max-height:46px;overflow:hidden;">{escape(ph_obs)}</div>'
@@ -651,77 +683,83 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
             f'</div>'
         )
 
-    # Speed loss bars
-    def _speed_bar(label: str, val_txt: str, fill_pct: int, sub: str, good: bool,
-                   last: bool = False) -> str:
-        col = GREEN if good else ORANGE
+    # Speed loss bars — bar colour is now driven by the same threshold as the
+    # right-side label/dot, so the three signals (bar, dot, label) always agree.
+    def _speed_bar(label: str, val_txt: str, fill_pct: int, sub: str,
+                   colour: str, last: bool = False) -> str:
         pct = max(2, min(95, fill_pct))
         mb  = "" if last else "margin-bottom:14px;"
         return (
             f'<div style="{mb}">'
             f'<div style="display:flex;justify-content:space-between;margin-bottom:4px;">'
             f'<span style="font-size:12px;color:{BODY};">{label}</span>'
-            f'<span style="font-size:12px;font-weight:700;color:{col};display:flex;'
+            f'<span style="font-size:12px;font-weight:700;color:{colour};display:flex;'
             f'align-items:center;gap:4px;">{val_txt}</span></div>'
             f'<div style="height:8px;background:#f0f4f8;border-radius:4px;">'
-            f'<div style="height:8px;background:{col};border-radius:4px;width:{pct}%;"></div></div>'
+            f'<div style="height:8px;background:{colour};border-radius:4px;width:{pct}%;"></div></div>'
             f'<div style="font-size:10px;color:{MUTED};margin-top:2px;">{sub}</div>'
             f'</div>'
         )
 
-    exit_bar_w    = max(10, min(95, exit_loss    * 3))
-    neutral_bar_w = max(10, min(95, neutral_loss * 3))
-    apex_bar_w    = max(10, min(95, apex_eff))
-
-    _exit_lbl, _   = _loss_label(exit_v)
-    _neut_lbl, _   = _loss_label(trans_v)
-    _apex_lbl, _   = _eff_label(apex_v)
-
     # ── Dynamic severity tags for subtitles ────────────────────────────────
     # Rule: add "основная потеря заезда" ONLY to the phase that is BOTH
     #   (a) the worst-scoring loss phase, AND
-    #   (b) absolutely bad (score < 7.0 → high-loss category).
-    # "минимальные потери" only when score >= 8.5 (matches loss_min threshold).
-    # Otherwise no tag — the right-side label + dot already convey severity,
-    # adding a contradictory tag like "минимальная потеря" to an 8.0 score
-    # (labelled "средняя потеря" orange) just confused readers.
+    #   (b) absolutely bad (< SCORE_ORANGE_MIN → high-loss).
+    # "минимальные потери" only when score >= SCORE_GREEN_MIN.
+    # Otherwise no tag — the right-side label + dot already convey severity.
     def _loss_tag(score: float, is_worst_loss: bool) -> str:
-        if is_worst_loss and score < 7.0:
+        if is_worst_loss and score < SCORE_ORANGE_MIN:
             return L["tag_main_loss"]
-        if score >= 8.5:
+        if score >= SCORE_GREEN_MIN:
             return L["tag_minor"]
         return ""
 
-    # Worst of exit vs transition = lower score
-    worst_is_exit  = exit_v < trans_v
-    worst_is_trans = trans_v < exit_v
-    exit_tag = _loss_tag(exit_v,  worst_is_exit)
-    neut_tag = _loss_tag(trans_v, worst_is_trans)
-
-    # Apex is an efficiency phase, not a loss phase — only tag extremes
-    if apex_v >= 8.5:
-        apex_tag = L["tag_apex_best"]
-    elif apex_v < 7.0:
-        apex_tag = L["tag_apex_weak"]
+    # Worst of exit vs transition (only among phases that actually have data)
+    if exit_v is not None and trans_v is not None:
+        worst_is_exit  = exit_v < trans_v
+        worst_is_trans = trans_v < exit_v
     else:
-        apex_tag = ""
+        # If one side missing, the other automatically becomes the "worst"
+        worst_is_exit  = exit_v is not None and trans_v is None
+        worst_is_trans = trans_v is not None and exit_v is None
+
+    def _apex_tag_for(score: float) -> str:
+        if score >= SCORE_GREEN_MIN: return L["tag_apex_best"]
+        if score < SCORE_ORANGE_MIN: return L["tag_apex_weak"]
+        return ""
 
     def _sub(base: str, tag: str) -> str:
         return f"{base} - {tag}" if tag else base
+
+    def _render_loss_bar(score, title: str, sub_base: str, is_worst: bool,
+                         last: bool = False) -> str:
+        """Render a speed-loss bar. Falls back to 'no data' row if score is None."""
+        if score is None:
+            return _speed_bar(title, f'<span style="color:{MUTED};">&mdash;</span>',
+                              10, L.get("no_data", "—"), MUTED, last=last)
+        lbl, col = _loss_label(score)
+        return _speed_bar(title, f"{_loss_dot(score)} {lbl}",
+                          _loss_bar_w(score),
+                          _sub(sub_base, _loss_tag(score, is_worst)),
+                          col, last=last)
+
+    def _render_eff_bar(score, title: str, sub_base: str, last: bool = False) -> str:
+        if score is None:
+            return _speed_bar(title, f'<span style="color:{MUTED};">&mdash;</span>',
+                              10, L.get("no_data", "—"), MUTED, last=last)
+        lbl, col = _eff_label(score)
+        return _speed_bar(title, f"{_loss_dot(score)} {lbl}",
+                          _eff_bar_w(score),
+                          _sub(sub_base, _apex_tag_for(score)),
+                          col, last=last)
 
     speed_bars = (
         f'<div style="padding:16px 20px;border-top:1px solid #e2e8f0;flex:none;margin-top:auto;">'
         f'<div style="font-size:12px;font-weight:700;color:{NAVY};text-transform:uppercase;'
         f'letter-spacing:0.5px;margin-bottom:14px;">{L["speed_loss_title"]}</div>'
-        + _speed_bar(L["bar_exit"],
-                     f"{_loss_dot(exit_v)} {_exit_lbl}", exit_bar_w,
-                     _sub(L["bar_exit_sub"], exit_tag), False)
-        + _speed_bar(L["bar_neutral"],
-                     f"{_loss_dot(trans_v)} {_neut_lbl}", neutral_bar_w,
-                     _sub(L["bar_neutral_sub"], neut_tag), False)
-        + _speed_bar(L["bar_apex"],
-                     f"{_loss_dot(apex_v)} {_apex_lbl}", apex_bar_w,
-                     _sub(L["bar_apex_sub"], apex_tag), True, last=True)
+        + _render_loss_bar(exit_v,  L["bar_exit"],    L["bar_exit_sub"],    worst_is_exit)
+        + _render_loss_bar(trans_v, L["bar_neutral"], L["bar_neutral_sub"], worst_is_trans)
+        + _render_eff_bar (apex_v,  L["bar_apex"],    L["bar_apex_sub"],    last=True)
         + '</div>'
     )
 

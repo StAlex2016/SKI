@@ -691,7 +691,10 @@ def parse_video_analysis(
     for key in ("entry", "apex", "exit", "transition"):
         if key not in phase_scores:
             vals = phase_frame_ratings[key]
-            phase_scores[key] = round(sum(vals) / len(vals), 1) if vals else 7.5
+            if vals:
+                phase_scores[key] = round(sum(vals) / len(vals), 1)
+            # else: leave key absent — renderer will show "—" instead of
+            # making up a fake 7.5 that looked like a real middling score.
 
     # ── Best frame per phase (highest rating)
     best_by_phase: dict[str, dict] = {}
@@ -860,6 +863,20 @@ def parse_video_analysis(
     ).strip()
     # Strip markdown bold from potential
     potential = re.sub(r'\*{1,2}([^*]+)\*{1,2}', r'\1', potential).strip()
+    # Normalise bullet prefixes — GPT sometimes writes a lead-in sentence
+    # without "-" and then switches to dashed bullets. Make every non-empty
+    # line consistent: single "- " prefix (or strip all if only one line).
+    _pot_lines = [ln.strip() for ln in potential.split("\n") if ln.strip()]
+    if len(_pot_lines) > 1:
+        _pot_lines = [
+            ln if ln.startswith(("-", "—", "–", "•")) else f"- {ln}"
+            for ln in _pot_lines
+        ]
+        # Unify dash style to ASCII "-"
+        _pot_lines = [
+            re.sub(r'^[—–•]+\s*', '- ', ln) for ln in _pot_lines
+        ]
+    potential = "\n".join(_pot_lines)
 
     # ── Debug summary
     print(
