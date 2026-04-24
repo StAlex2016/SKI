@@ -61,7 +61,14 @@ def strip_frame_refs(text: str) -> str:
     s = re.sub(r"\(\s*\)", "", s)
     s = re.sub(r",\s*,", ",", s)
     s = re.sub(r":\s*,", ":", s)
-    return s.strip(" .,;:-—–")
+    # Trim leading/trailing junk left by removed frame refs. Em-dash and
+    # en-dash are typographic connectors (fair game to strip), but ASCII "-"
+    # is commonly used as a BULLET PREFIX in multi-line text (e.g. the
+    # Potential section) — must NOT strip it, or the first bullet loses its
+    # dash after cleaning.
+    s = re.sub(r"^[\s,;:—–]+", "", s)
+    s = re.sub(r"[\s.,;:—–]+$", "", s)
+    return s
 
 
 # Trailing conjunctions/prepositions that dangle when truncation cuts mid-thought.

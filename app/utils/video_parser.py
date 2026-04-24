@@ -357,7 +357,12 @@ def parse_video_analysis(
                     r"[^)]*\)",
                     "", clean, flags=re.I,
                 )
-                clean = re.sub(r"[\-–:*]+", " ", clean).strip()
+                # Normalise dash/asterisk artefacts — but KEEP ":" as it is a
+                # meaningful separator (e.g. "Положение тела: Корпус стабилен").
+                # Previously this regex included ":" which silently stripped the
+                # colon and produced mangled observations like
+                # "Положение тела Корпус стабилен".
+                clean = re.sub(r"[\-–*]+", " ", clean).strip()
                 if len(clean) > 10:
                     fd["obs"] = clean
 
@@ -731,6 +736,18 @@ def parse_video_analysis(
             obs = re.sub(r'\*{1,2}([^*]+)\*{1,2}', r'\1', obs).strip()
             # Strip "Скорость: " / "Speed: " prefix left by GPT observation labels
             obs = re.sub(r'^(Скорость|Speed|скорост\w*)[:\s]+', '', obs, flags=re.IGNORECASE).strip()
+            # Strip frame-field label prefix ("• Положение тела:", "• Body position:",
+            # "• Работа лыж:" etc.) so card shows just the content — the card
+            # already has the phase heading, the label is redundant.
+            obs = re.sub(
+                r'^[•·\s]*(?:положени[ея]\s+тела|работа\s+лыж|позиция|'
+                r'выполнено\s+правильно|недостат(?:ок|ки)|фаза|'
+                r'body\s+position|ski\s+work|position|'
+                r'done\s+(?:correctly|well)|weakness(?:es)?|phase)\s*[:\-–]\s*',
+                '', obs, flags=re.IGNORECASE,
+            ).strip()
+            # Also strip leading bare bullet if nothing else matched
+            obs = re.sub(r'^[•·\s]+', '', obs).strip()
             # Enrich short obs with first numbered point from frame analysis
             if len(obs) < 100 and fd.get("points"):
                 extra = fd["points"][0]
@@ -899,6 +916,33 @@ def parse_video_analysis(
     for dr in drills:
         dr["name"]        = _clean_str(dr.get("name", ""))
         dr["description"] = _clean_str(dr.get("description", ""))
+
+    # ── Overall score sanity check
+    # GPT's holistic "7.5/10" sometimes drifts well above the actual phase
+    # evidence. If two phases are <7.0 ("high loss - priority") but overall
+    # claims 7.5, the user spots the inconsistency. Guard: when GPT overall
+    # deviates from the data-derived expected score by more than 0.4, snap
+    # to the expected value.
+    # Weighting: phases weigh more (0.6) than radar (0.4) because phase
+    # scores capture dynamic behaviour; radar captures postural snapshots.
+    try:
+        _ph_vals = [float(v) for v in phase_scores.values() if v is not None]
+        _rd_vals = [float(v) for v in radar.values() if v is not None]
+        if _ph_vals and _rd_vals and overall_score is not None:
+            _ph_avg  = sum(_ph_vals) / len(_ph_vals)
+            _rd_avg  = sum(_rd_vals) / len(_rd_vals)
+            _expected = 0.6 * _ph_avg + 0.4 * _rd_avg
+            if abs(float(overall_score) - _expected) > 0.4:
+                _corrected = round(_expected, 1)
+                print(
+                    f"[parser] overall sanity: gpt={overall_score} "
+                    f"ph_avg={_ph_avg:.2f} rd_avg={_rd_avg:.2f} "
+                    f"expected={_expected:.2f} → snap to {_corrected}",
+                    flush=True,
+                )
+                overall_score = _corrected
+    except Exception as _e:
+        print(f"[parser] overall sanity check skipped: {_e}", flush=True)
 
     # ── Resolve key frame paths
     key_frames: list[dict] = []
