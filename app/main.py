@@ -898,6 +898,52 @@ def parse_quality_result(quality_text: str) -> dict:
     return result
 
 
+# ── SCALE HELP ─────────────────────────────────────────────────────────────────
+# Visible to any user. Explains the 1-10 scoring scale so a "6/10" doesn't read
+# as "bad" but rather "developmental, here is what 6 anchors to".
+
+_SCALE_TEXT_RU = (
+    "📏 <b>Шкала оценок 1-10</b>\n\n"
+    "Балл показывает уровень техники <b>относительно ровесников</b> "
+    "(твоей категории U8/U10/.../Adult), не относительно профи.\n\n"
+    "<b>1-2</b> — начало пути: ещё не катаешься уверенно\n"
+    "<b>3</b> — плуг (V-образная стойка)\n"
+    "<b>4</b> — переход плуг → стем-поворот\n"
+    "<b>5</b> — параллельные лыжи, но без карвинга (всё на скольжении)\n"
+    "<b>6</b> — базовый карвинг в отдельных поворотах\n"
+    "<b>7</b> — устойчивый карвинг, средний уровень для категории\n"
+    "<b>8</b> — раннее зацепление канта, выше среднего\n"
+    "<b>9</b> — эталон для категории, уровень региональных гонок\n"
+    "<b>10</b> — национальный/международный уровень\n\n"
+    "<i>Балл 5-6 — это нормальный developmental stage, а не «плохо». "
+    "Каждый профи когда-то был на 3-4.</i>"
+)
+_SCALE_TEXT_EN = (
+    "📏 <b>Scoring scale 1-10</b>\n\n"
+    "The score reflects technique level <b>relative to peers</b> in your "
+    "category (U8/U10/.../Adult), not relative to pros.\n\n"
+    "<b>1-2</b> — beginner: no confident skiing yet\n"
+    "<b>3</b> — snowplow (V-shape stance)\n"
+    "<b>4</b> — transition snowplow → stem-turn\n"
+    "<b>5</b> — parallel skis, no carving (all skidding)\n"
+    "<b>6</b> — basic carving in some turns\n"
+    "<b>7</b> — consistent carving, average for category\n"
+    "<b>8</b> — early edge engagement, above average\n"
+    "<b>9</b> — reference for category, regional race level\n"
+    "<b>10</b> — national/international level\n\n"
+    "<i>A score of 5-6 is a normal developmental stage, not 'bad'. "
+    "Every pro was once at 3-4.</i>"
+)
+
+
+async def scale_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """`/scale` — explain the 1-10 scoring scale to the user."""
+    user_id = update.message.from_user.id
+    lang = state.get_lang(user_id) or "ru"
+    text = _SCALE_TEXT_RU if lang == "ru" else _SCALE_TEXT_EN
+    await update.message.reply_text(text, parse_mode="HTML")
+
+
 # ── HANDLERS ───────────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1809,23 +1855,34 @@ def main():
     app.add_handler(CommandHandler("deny", deny_cmd))
     app.add_handler(CommandHandler("pending", pending_cmd))
     app.add_handler(CommandHandler("admin", admin_cmd))
+    app.add_handler(CommandHandler("scale", scale_cmd))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     app.add_handler(MessageHandler(filters.VIDEO | filters.Document.VIDEO, handle_video))
     app.add_handler(CallbackQueryHandler(handle_callback))
 
     async def set_commands(app):
-        # Default menu (everyone sees this)
+        # Default menu (everyone sees this) — added /scale so users can look
+        # up what a "6/10" actually means without thinking the bot is broken.
         await app.bot.set_my_commands(
-            [BotCommand("start", "Start analysis")],
+            [
+                BotCommand("start", "Start analysis"),
+                BotCommand("scale", "What do the scores mean?"),
+            ],
             language_code="en",
         )
         await app.bot.set_my_commands(
-            [BotCommand("start", "Начать анализ")],
+            [
+                BotCommand("start", "Начать анализ"),
+                BotCommand("scale", "Что означают баллы?"),
+            ],
             language_code="ru",
         )
         await app.bot.set_my_commands(
-            [BotCommand("start", "Начать анализ / Start analysis")],
+            [
+                BotCommand("start", "Начать анализ / Start analysis"),
+                BotCommand("scale", "Что означают баллы / What do scores mean"),
+            ],
         )
         # Admin-scoped menu (only OWNER sees these in slash menu)
         try:

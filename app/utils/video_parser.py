@@ -906,6 +906,31 @@ def parse_video_analysis(
     print(f"[parser] frame_data keys={list(frame_data.keys())}", flush=True)
     print(f"[parser] drills={[d['name'] for d in drills]}", flush=True)
 
+    # ── Score distribution metrics (so we can watch calibration over time)
+    try:
+        import statistics as _stats
+        _ph_vals = [float(v) for v in phase_scores.values() if v is not None]
+        _rd_vals = [float(v) for v in radar.values() if v is not None]
+        _fr_vals = [float(fd.get("rating") or 0) for fd in frame_data.values()
+                    if fd.get("rating") is not None]
+
+        def _stats_str(name: str, vals: list[float]) -> str:
+            if not vals:
+                return f"{name}: n=0"
+            s = (f"{name}: n={len(vals)} min={min(vals):.1f} max={max(vals):.1f} "
+                 f"mean={_stats.mean(vals):.2f}")
+            if len(vals) > 1:
+                s += f" stdev={_stats.stdev(vals):.2f}"
+            return s
+
+        print("[parser-metrics] " + " | ".join([
+            _stats_str("phases", _ph_vals),
+            _stats_str("radar",  _rd_vals),
+            _stats_str("frames", _fr_vals),
+        ]), flush=True)
+    except Exception as _e:
+        print(f"[parser-metrics] failed: {_e}", flush=True)
+
     # Clean all text fields
     strengths  = [_clean_str(s) for s in strengths]
     weaknesses = [_clean_str(s) for s in weaknesses]

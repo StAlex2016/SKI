@@ -173,11 +173,28 @@ _PROMPTS = {
 Общая оценка техники: X/10
 Один абзац: главный приоритет на следующую тренировку.
 
-КАЛИБРОВКА ОЦЕНКИ:
-- Оценка должна соответствовать содержанию анализа, а не быть заниженной по умолчанию
-- Если 3 сильные стороны и фазовые оценки преимущественно 7+, общий балл не может быть ниже 7
-- 6/10 = заметные технические проблемы во всех фазах; 7/10 = рабочая техника с зонами роста; 8/10 = сильная техника с мелкими недочётами
-- Не занижай балл ради "мотивации к росту" — балл должен быть честным
+КАЛИБРОВОЧНАЯ ШКАЛА (применяется ко ВСЕМ оценкам: общая, фазы, радар, кадры)
+
+Шкала 1-10 для категории {category}, с привязкой к НАБЛЮДАЕМЫМ признакам:
+
+  1/10 — не катается / постоянные падения / не удерживает равновесие
+  2/10 — едет «лесенкой» / нет контроля скорости / частые падения
+  3/10 — плуг (V-образная стойка) — поворот через скольжение
+  4/10 — переход плуг→стем: внутренняя лыжа полу-параллельна, нет смены канта
+  5/10 — параллельные лыжи БЕЗ карвинга: хвост лыжи моется (skid), все повороты на скольжении
+  6/10 — базовый карвинг в отдельных поворотах, нестабильно; НИЖЕ среднего для {category}
+  7/10 — устойчивый карвинг с мелкой нестабильностью; СРЕДНИЙ для {category}
+  8/10 — раннее зацепление канта, минимальное скольжение; ВЫШЕ среднего для {category}
+  9/10 — эталон для {category}: чистый карвинг во всех фазах, уровень региональных гонок
+ 10/10 — идеал, образец на уровне национальной/международной школы
+
+ПРАВИЛА КАЛИБРОВКИ:
+- Используй ВЕСЬ диапазон 3-9. Не кластеризуй оценки в 7-8.
+- ЗАПРЕЩЕНО искусственно держать балл ≥7 «ради мотивации». Балл 4-6 — это developmental stage, не «плохо».
+- Балл ставится ОТНОСИТЕЛЬНО ровесников ({category}), не относительно профи.
+- Если все элементы РЕАЛЬНО похожи по качеству — оценки могут быть близкими. НЕ создавай искусственный разброс.
+- Если техника РЕАЛЬНО различается между кадрами — оценки кадров должны это отражать. НЕ давай всем кадрам одинаковый балл если виден прогресс/регресс/срыв.
+- Балл должен быть честным: видишь плуг → ставь 3, видишь чистый карвинг → 8-9, видишь падение → 1-2.
 
 ═══ ТЕХНИЧЕСКИЙ ПРОФИЛЬ ═══
 
@@ -331,11 +348,28 @@ _PROMPTS = {
 Общая оценка техники: X/10
 Главный фокус на следующую тренировку — одно предложение.
 
-КАЛИБРОВКА ОЦЕНКИ:
-- Оценка должна соответствовать содержанию анализа, а не быть заниженной по умолчанию
-- Если 3 сильные стороны и фазовые оценки преимущественно 7+, общий балл не может быть ниже 7
-- 6/10 = заметные технические проблемы во всех фазах; 7/10 = рабочая техника с зонами роста; 8/10 = сильная техника с мелкими недочётами
-- Не занижай балл ради "мотивации к росту" — балл должен быть честным
+КАЛИБРОВОЧНАЯ ШКАЛА (применяется ко ВСЕМ оценкам: общая, фазы, радар, кадры)
+
+Шкала 1-10 для категории {category}, с привязкой к НАБЛЮДАЕМЫМ признакам:
+
+  1/10 — не катается / постоянные падения / не удерживает равновесие
+  2/10 — едет «лесенкой» / нет контроля скорости / частые падения
+  3/10 — плуг (V-образная стойка) — поворот через скольжение
+  4/10 — переход плуг→стем: внутренняя лыжа полу-параллельна, нет смены канта
+  5/10 — параллельные лыжи БЕЗ карвинга: хвост лыжи моется (skid), все повороты на скольжении
+  6/10 — базовый карвинг в отдельных поворотах, нестабильно; НИЖЕ среднего для {category}
+  7/10 — устойчивый карвинг с мелкой нестабильностью; СРЕДНИЙ для {category}
+  8/10 — раннее зацепление канта, минимальное скольжение; ВЫШЕ среднего для {category}
+  9/10 — эталон для {category}: чистый карвинг во всех фазах, уровень региональных гонок
+ 10/10 — идеал, образец на уровне национальной/международной школы
+
+ПРАВИЛА КАЛИБРОВКИ:
+- Используй ВЕСЬ диапазон 3-9. Не кластеризуй оценки в 7-8.
+- ЗАПРЕЩЕНО искусственно держать балл ≥7 «ради мотивации». Балл 4-6 — это developmental stage, не «плохо».
+- Балл ставится ОТНОСИТЕЛЬНО ровесников ({category}), не относительно профи.
+- Если все элементы РЕАЛЬНО похожи по качеству — оценки могут быть близкими. НЕ создавай искусственный разброс.
+- Если техника РЕАЛЬНО различается между кадрами — оценки кадров должны это отражать. НЕ давай всем кадрам одинаковый балл если виден прогресс/регресс/срыв.
+- Балл должен быть честным: видишь плуг → ставь 3, видишь чистый карвинг → 8-9, видишь падение → 1-2.
 
 ═══ ТЕХНИЧЕСКИЙ ПРОФИЛЬ ═══
 
@@ -485,11 +519,28 @@ INTEGRITY RULES (MANDATORY):
 Overall technique score: X/10
 One paragraph: the single highest-priority focus for the next training session.
 
-SCORE CALIBRATION:
-- Score must match the analysis content, not be systematically low
-- If 3 strengths identified and phase scores mostly 7+, overall cannot be below 7
-- 6/10 = noticeable technical issues in all phases; 7/10 = working technique with growth areas; 8/10 = strong technique with minor issues
-- Do not lower score for "motivation" — score must be honest
+SCORING SCALE (applied to ALL scores: overall, phase, radar, per-frame)
+
+Scale 1-10 for category {category}, anchored to OBSERVABLE technique markers:
+
+  1/10 — cannot ski / constant falls / cannot maintain balance
+  2/10 — "stair-stepping" down / no speed control / frequent falls
+  3/10 — snowplow (V-shape stance) — turns via skidding
+  4/10 — transition snowplow → stem-turn: inside ski partly parallel, no edge change
+  5/10 — parallel skis WITHOUT carving: tail washes (skid), all turns on skid
+  6/10 — basic carving in some turns, inconsistent; BELOW average for {category}
+  7/10 — consistent carving with minor instability; AVERAGE for {category}
+  8/10 — early edge engagement, minimal skid; ABOVE average for {category}
+  9/10 — reference for {category}: clean carving in all phases, regional race level
+ 10/10 — ideal, national/international school level
+
+SCORING RULES:
+- Use the FULL range 3-9. Do NOT cluster scores in 7-8.
+- FORBIDDEN to artificially keep score ≥7 "for motivation". A score of 4-6 is a developmental stage, not "bad".
+- Score is RELATIVE to peers in {category}, not relative to professionals.
+- If all elements are GENUINELY similar in quality — scores can be close. DO NOT create artificial spread.
+- If technique GENUINELY varies between frames — frame scores must reflect this. DO NOT give every frame the same score if progress/regress/breakdown is visible.
+- Score must be honest: see snowplow → put 3, see clean carving → 8-9, see a fall → 1-2.
 
 ═══ TECHNICAL PROFILE ═══
 
@@ -643,11 +694,28 @@ INTEGRITY RULES (MANDATORY):
 Overall technique score: X/10
 Single highest-priority focus for the next training session — one sentence.
 
-SCORE CALIBRATION:
-- Score must match the analysis content, not be systematically low
-- If 3 strengths identified and phase scores mostly 7+, overall cannot be below 7
-- 6/10 = noticeable technical issues in all phases; 7/10 = working technique with growth areas; 8/10 = strong technique with minor issues
-- Do not lower score for "motivation" — score must be honest
+SCORING SCALE (applied to ALL scores: overall, phase, radar, per-frame)
+
+Scale 1-10 for category {category}, anchored to OBSERVABLE technique markers:
+
+  1/10 — cannot ski / constant falls / cannot maintain balance
+  2/10 — "stair-stepping" down / no speed control / frequent falls
+  3/10 — snowplow (V-shape stance) — turns via skidding
+  4/10 — transition snowplow → stem-turn: inside ski partly parallel, no edge change
+  5/10 — parallel skis WITHOUT carving: tail washes (skid), all turns on skid
+  6/10 — basic carving in some turns, inconsistent; BELOW average for {category}
+  7/10 — consistent carving with minor instability; AVERAGE for {category}
+  8/10 — early edge engagement, minimal skid; ABOVE average for {category}
+  9/10 — reference for {category}: clean carving in all phases, regional race level
+ 10/10 — ideal, national/international school level
+
+SCORING RULES:
+- Use the FULL range 3-9. Do NOT cluster scores in 7-8.
+- FORBIDDEN to artificially keep score ≥7 "for motivation". A score of 4-6 is a developmental stage, not "bad".
+- Score is RELATIVE to peers in {category}, not relative to professionals.
+- If all elements are GENUINELY similar in quality — scores can be close. DO NOT create artificial spread.
+- If technique GENUINELY varies between frames — frame scores must reflect this. DO NOT give every frame the same score if progress/regress/breakdown is visible.
+- Score must be honest: see snowplow → put 3, see clean carving → 8-9, see a fall → 1-2.
 
 ═══ TECHNICAL PROFILE ═══
 
@@ -796,11 +864,28 @@ OK to write: "above average for age", "developing ahead of typical", "creates a 
 Гоночная оценка техники: X/10
 Главный приоритет для следующей гонки или видеоразбора — одно предложение.
 
-КАЛИБРОВКА ОЦЕНКИ:
-- Оценка должна соответствовать содержанию анализа, а не быть заниженной по умолчанию
-- Если 3 сильные стороны и фазовые оценки преимущественно 7+, общий балл не может быть ниже 7
-- 6/10 = заметные технические проблемы во всех фазах; 7/10 = рабочая техника с зонами роста; 8/10 = сильная техника с мелкими недочётами
-- Не занижай балл ради "мотивации к росту" — балл должен быть честным
+КАЛИБРОВОЧНАЯ ШКАЛА (применяется ко ВСЕМ оценкам: общая, фазы, радар, кадры)
+
+Шкала 1-10 для категории {category}, с привязкой к НАБЛЮДАЕМЫМ признакам:
+
+  1/10 — не катается / постоянные падения / не удерживает равновесие
+  2/10 — едет «лесенкой» / нет контроля скорости / частые падения
+  3/10 — плуг (V-образная стойка) — поворот через скольжение
+  4/10 — переход плуг→стем: внутренняя лыжа полу-параллельна, нет смены канта
+  5/10 — параллельные лыжи БЕЗ карвинга: хвост лыжи моется (skid), все повороты на скольжении
+  6/10 — базовый карвинг в отдельных поворотах, нестабильно; НИЖЕ среднего для {category}
+  7/10 — устойчивый карвинг с мелкой нестабильностью; СРЕДНИЙ для {category}
+  8/10 — раннее зацепление канта, минимальное скольжение; ВЫШЕ среднего для {category}
+  9/10 — эталон для {category}: чистый карвинг во всех фазах, уровень региональных гонок
+ 10/10 — идеал, образец на уровне национальной/международной школы
+
+ПРАВИЛА КАЛИБРОВКИ:
+- Используй ВЕСЬ диапазон 3-9. Не кластеризуй оценки в 7-8.
+- ЗАПРЕЩЕНО искусственно держать балл ≥7 «ради мотивации». Балл 4-6 — это developmental stage, не «плохо».
+- Балл ставится ОТНОСИТЕЛЬНО ровесников ({category}), не относительно профи.
+- Если все элементы РЕАЛЬНО похожи по качеству — оценки могут быть близкими. НЕ создавай искусственный разброс.
+- Если техника РЕАЛЬНО различается между кадрами — оценки кадров должны это отражать. НЕ давай всем кадрам одинаковый балл если виден прогресс/регресс/срыв.
+- Балл должен быть честным: видишь плуг → ставь 3, видишь чистый карвинг → 8-9, видишь падение → 1-2.
 
 ═══ ТЕХНИЧЕСКИЙ ПРОФИЛЬ ═══
 
@@ -957,11 +1042,28 @@ OK to write: "above average for age", "developing ahead of typical", "creates a 
 Гоночная оценка техники: X/10
 Один приоритет до следующего старта — одно предложение.
 
-КАЛИБРОВКА ОЦЕНКИ:
-- Оценка должна соответствовать содержанию анализа, а не быть заниженной по умолчанию
-- Если 3 сильные стороны и фазовые оценки преимущественно 7+, общий балл не может быть ниже 7
-- 6/10 = заметные технические проблемы во всех фазах; 7/10 = рабочая техника с зонами роста; 8/10 = сильная техника с мелкими недочётами
-- Не занижай балл ради "мотивации к росту" — балл должен быть честным
+КАЛИБРОВОЧНАЯ ШКАЛА (применяется ко ВСЕМ оценкам: общая, фазы, радар, кадры)
+
+Шкала 1-10 для категории {category}, с привязкой к НАБЛЮДАЕМЫМ признакам:
+
+  1/10 — не катается / постоянные падения / не удерживает равновесие
+  2/10 — едет «лесенкой» / нет контроля скорости / частые падения
+  3/10 — плуг (V-образная стойка) — поворот через скольжение
+  4/10 — переход плуг→стем: внутренняя лыжа полу-параллельна, нет смены канта
+  5/10 — параллельные лыжи БЕЗ карвинга: хвост лыжи моется (skid), все повороты на скольжении
+  6/10 — базовый карвинг в отдельных поворотах, нестабильно; НИЖЕ среднего для {category}
+  7/10 — устойчивый карвинг с мелкой нестабильностью; СРЕДНИЙ для {category}
+  8/10 — раннее зацепление канта, минимальное скольжение; ВЫШЕ среднего для {category}
+  9/10 — эталон для {category}: чистый карвинг во всех фазах, уровень региональных гонок
+ 10/10 — идеал, образец на уровне национальной/международной школы
+
+ПРАВИЛА КАЛИБРОВКИ:
+- Используй ВЕСЬ диапазон 3-9. Не кластеризуй оценки в 7-8.
+- ЗАПРЕЩЕНО искусственно держать балл ≥7 «ради мотивации». Балл 4-6 — это developmental stage, не «плохо».
+- Балл ставится ОТНОСИТЕЛЬНО ровесников ({category}), не относительно профи.
+- Если все элементы РЕАЛЬНО похожи по качеству — оценки могут быть близкими. НЕ создавай искусственный разброс.
+- Если техника РЕАЛЬНО различается между кадрами — оценки кадров должны это отражать. НЕ давай всем кадрам одинаковый балл если виден прогресс/регресс/срыв.
+- Балл должен быть честным: видишь плуг → ставь 3, видишь чистый карвинг → 8-9, видишь падение → 1-2.
 
 ═══ ТЕХНИЧЕСКИЙ ПРОФИЛЬ ═══
 
@@ -1114,11 +1216,28 @@ INTEGRITY RULES (MANDATORY):
 Race technique score: X/10
 Single highest priority before the next race or video review — one sentence.
 
-SCORE CALIBRATION:
-- Score must match the analysis content, not be systematically low
-- If 3 strengths identified and phase scores mostly 7+, overall cannot be below 7
-- 6/10 = noticeable technical issues in all phases; 7/10 = working technique with growth areas; 8/10 = strong technique with minor issues
-- Do not lower score for "motivation" — score must be honest
+SCORING SCALE (applied to ALL scores: overall, phase, radar, per-frame)
+
+Scale 1-10 for category {category}, anchored to OBSERVABLE technique markers:
+
+  1/10 — cannot ski / constant falls / cannot maintain balance
+  2/10 — "stair-stepping" down / no speed control / frequent falls
+  3/10 — snowplow (V-shape stance) — turns via skidding
+  4/10 — transition snowplow → stem-turn: inside ski partly parallel, no edge change
+  5/10 — parallel skis WITHOUT carving: tail washes (skid), all turns on skid
+  6/10 — basic carving in some turns, inconsistent; BELOW average for {category}
+  7/10 — consistent carving with minor instability; AVERAGE for {category}
+  8/10 — early edge engagement, minimal skid; ABOVE average for {category}
+  9/10 — reference for {category}: clean carving in all phases, regional race level
+ 10/10 — ideal, national/international school level
+
+SCORING RULES:
+- Use the FULL range 3-9. Do NOT cluster scores in 7-8.
+- FORBIDDEN to artificially keep score ≥7 "for motivation". A score of 4-6 is a developmental stage, not "bad".
+- Score is RELATIVE to peers in {category}, not relative to professionals.
+- If all elements are GENUINELY similar in quality — scores can be close. DO NOT create artificial spread.
+- If technique GENUINELY varies between frames — frame scores must reflect this. DO NOT give every frame the same score if progress/regress/breakdown is visible.
+- Score must be honest: see snowplow → put 3, see clean carving → 8-9, see a fall → 1-2.
 
 ═══ TECHNICAL PROFILE ═══
 
@@ -1273,11 +1392,28 @@ INTEGRITY RULES (MANDATORY):
 Race technique score: X/10
 Single priority before the next start — one sentence.
 
-SCORE CALIBRATION:
-- Score must match the analysis content, not be systematically low
-- If 3 strengths identified and phase scores mostly 7+, overall cannot be below 7
-- 6/10 = noticeable technical issues in all phases; 7/10 = working technique with growth areas; 8/10 = strong technique with minor issues
-- Do not lower score for "motivation" — score must be honest
+SCORING SCALE (applied to ALL scores: overall, phase, radar, per-frame)
+
+Scale 1-10 for category {category}, anchored to OBSERVABLE technique markers:
+
+  1/10 — cannot ski / constant falls / cannot maintain balance
+  2/10 — "stair-stepping" down / no speed control / frequent falls
+  3/10 — snowplow (V-shape stance) — turns via skidding
+  4/10 — transition snowplow → stem-turn: inside ski partly parallel, no edge change
+  5/10 — parallel skis WITHOUT carving: tail washes (skid), all turns on skid
+  6/10 — basic carving in some turns, inconsistent; BELOW average for {category}
+  7/10 — consistent carving with minor instability; AVERAGE for {category}
+  8/10 — early edge engagement, minimal skid; ABOVE average for {category}
+  9/10 — reference for {category}: clean carving in all phases, regional race level
+ 10/10 — ideal, national/international school level
+
+SCORING RULES:
+- Use the FULL range 3-9. Do NOT cluster scores in 7-8.
+- FORBIDDEN to artificially keep score ≥7 "for motivation". A score of 4-6 is a developmental stage, not "bad".
+- Score is RELATIVE to peers in {category}, not relative to professionals.
+- If all elements are GENUINELY similar in quality — scores can be close. DO NOT create artificial spread.
+- If technique GENUINELY varies between frames — frame scores must reflect this. DO NOT give every frame the same score if progress/regress/breakdown is visible.
+- Score must be honest: see snowplow → put 3, see clean carving → 8-9, see a fall → 1-2.
 
 ═══ TECHNICAL PROFILE ═══
 

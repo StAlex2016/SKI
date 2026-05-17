@@ -61,6 +61,13 @@ _I18N = {
         "tag_minor":      "минимальные потери",
         "tag_apex_best":  "нет потерь, лучшее место заезда",
         "tag_apex_weak":  "точка роста - теряется контакт с кантом",
+        # Relative framing labels — applied next to overall + per-phase score
+        # so a number like "7.5" reads as "above average for U10", not abstract.
+        "rel_elite":      "эталон для",
+        "rel_above":      "выше среднего для",
+        "rel_average":    "средний для",
+        "rel_below":      "ниже среднего для",
+        "rel_developing": "developmental для",
         "speed_pct": "скорость", "tech_pct": "техника",
         "drill_action": "Что делать", "drill_focus": "Фокус", "drill_success": "Успех",
         "no_data": "Нет данных",
@@ -94,6 +101,11 @@ _I18N = {
         "tag_minor":      "minimal loss",
         "tag_apex_best":  "no losses, best part of run",
         "tag_apex_weak":  "growth area - edge contact lost",
+        "rel_elite":      "reference for",
+        "rel_above":      "above average for",
+        "rel_average":    "average for",
+        "rel_below":      "below average for",
+        "rel_developing": "developmental for",
         "speed_pct": "speed", "tech_pct": "technique",
         "drill_action": "Action", "drill_focus": "Focus", "drill_success": "Success",
         "no_data": "No data",
@@ -194,6 +206,32 @@ def _sc(v: float) -> str:
     if v >= SCORE_GREEN_MIN:  return GREEN
     if v >= SCORE_ORANGE_MIN: return ORANGE
     return RED
+
+
+def _relative_label(score: float, category: str, lang_dict: dict) -> str:
+    """Convert numeric score to 'above average for U10' style descriptor.
+
+    Maps the calibrated 1-10 anchor scale to a categorical band so the user
+    sees meaning beside the raw number. Bands align with the SCORING SCALE
+    block in the prompt:
+        9.0+ → reference (эталон)
+        8.0+ → above average
+        6.5+ → average
+        5.0+ → below average
+        <5.0 → developmental
+    """
+    if not category:
+        category = ""
+    cat = str(category).strip()
+    if score >= 9.0:
+        return f"{lang_dict['rel_elite']} {cat}".strip()
+    if score >= 8.0:
+        return f"{lang_dict['rel_above']} {cat}".strip()
+    if score >= 6.5:
+        return f"{lang_dict['rel_average']} {cat}".strip()
+    if score >= 5.0:
+        return f"{lang_dict['rel_below']} {cat}".strip()
+    return f"{lang_dict['rel_developing']} {cat}".strip()
 
 
 # ── WEIGHTS ───────────────────────────────────────────────────────────────────
@@ -514,7 +552,8 @@ def build_html_detailed(data: dict, lang: str) -> str:  # noqa: C901
         f'</div>'
         f'<div style="flex:1;padding-bottom:6px;">'
         f'<div style="font-size:10px;color:#7a9bbf;text-transform:uppercase;'
-        f'letter-spacing:1px;margin-bottom:6px;">{L["overall"]} &middot; {cat_lbl}</div>'
+        f'letter-spacing:1px;margin-bottom:6px;">{L["overall"]} &middot; '
+        f'{escape(_relative_label(score_val, category, L))} &middot; {cat_lbl}</div>'
         f'<div style="height:7px;background:rgba(255,255,255,0.15);border-radius:4px;">'
         f'<div style="height:7px;background:#fff;border-radius:4px;width:{score_pct}%;"></div>'
         f'</div></div>'
