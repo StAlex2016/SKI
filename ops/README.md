@@ -1,5 +1,73 @@
 # Prod / Staging split — operator guide
 
+## Code-base layout (git worktrees)
+
+Prod and staging point to **separate working directories** sharing the same
+git history, so each environment is pinned to its own branch and a crash +
+auto-restart cannot accidentally pick up the other env's code.
+
+```
+/home/ubuntu/
+├── ski-mvp-bot/        ← PROD worktree, tracks branch `main`
+│   ├── app/ ...
+│   ├── venv/           ← Python venv (shared via symlink from staging)
+│   ├── .env.prod       ← prod env vars
+│   └── .env.staging    ← staging env vars (lives here; symlinked from staging worktree)
+└── ski-staging/        ← STAGING worktree, tracks `score-calibration` (or any feature branch)
+    ├── app/ ...        ← independent checkout
+    ├── venv → /home/ubuntu/ski-mvp-bot/venv   ← symlink
+    └── .env.staging → /home/ubuntu/ski-mvp-bot/.env.staging  ← symlink
+```
+
+### Routine workflow
+
+**Deploy a hotfix to prod:**
+```bash
+cd /home/ubuntu/ski-mvp-bot
+git pull origin main         # or merge a feature branch
+sudo systemctl restart skibot-prod.service
+```
+
+**Test a feature on staging without touching prod:**
+```bash
+cd /home/ubuntu/ski-staging
+git fetch origin
+git checkout <feature-branch>     # e.g. score-calibration
+sudo systemctl restart skibot-staging.service
+```
+
+**Add a brand-new feature branch to staging:**
+```bash
+cd /home/ubuntu/ski-mvp-bot
+git worktree remove /home/ubuntu/ski-staging        # tear down current
+git worktree add /home/ubuntu/ski-staging <new-branch>
+ln -s /home/ubuntu/ski-mvp-bot/venv /home/ubuntu/ski-staging/venv
+ln -s /home/ubuntu/ski-mvp-bot/.env.staging /home/ubuntu/ski-staging/.env.staging
+sudo systemctl start skibot-staging.service
+```
+
+**Verify isolation:**
+```bash
+# Two different commits — that's the point
+git -C /home/ubuntu/ski-mvp-bot rev-parse HEAD
+git -C /home/ubuntu/ski-staging rev-parse HEAD
+
+# systemd processes live in distinct CWDs
+for s in skibot-prod skibot-staging; do
+  pid=$(systemctl show $s.service -p MainPID --value)
+  echo "$s cwd=$(readlink /proc/$pid/cwd)"
+done
+```
+
+### Why this matters
+
+Before worktrees, both services used `WorkingDirectory=/home/ubuntu/ski-mvp-bot`.
+If staging checked out a feature branch on disk and prod restarted (crash,
+OOM, manual `restart`) — prod would load the staging branch by accident.
+Worktrees keep each env's code **physically separate** at the filesystem level.
+
+---
+
 ## What changed in code
 
 - `app/config.py` — centralized env: `APP_ENV`, `ALLOWED_USER_IDS`, `OWNER_ID`, `LOG_DIR`, `OUTPUT_DIR`, `TMP_DIR`, `REDIS_DB`.
