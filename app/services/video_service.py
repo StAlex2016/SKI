@@ -196,6 +196,17 @@ _PROMPTS = {
 - Если техника РЕАЛЬНО различается между кадрами — оценки кадров должны это отражать. НЕ давай всем кадрам одинаковый балл если виден прогресс/регресс/срыв.
 - Балл должен быть честным: видишь плуг → ставь 3, видишь чистый карвинг → 8-9, видишь падение → 1-2.
 
+АСИММЕТРИЯ ОЦЕНКИ — НЕ ТОЛЬКО ШТРАФУЕМ ЗА ОШИБКИ:
+- Сильные элементы ПОДНИМАЮТ балл, не только сглаживают штрафы.
+- "Есть угол кантования" ≠ "хороший apex" — оцениваешь КАЧЕСТВО исполнения, а не сам факт попытки.
+- Если в видео устойчивый карвинг в БОЛЬШИНСТВЕ поворотов → overall в диапазоне 7-9, НЕ 6.
+- Если ритмичный pole plant + чистая линия + динамичный переход → overall не ниже 7.
+- Если ДВА видео одной категории имеют РАЗНЫЙ базовый уровень техники — их баллы ДОЛЖНЫ отличаться. Не клади всех средне-сильных в один 6.
+- Балл отражает УРОВЕНЬ техники, а не только количество ошибок. Формула:
+    score = базовый уровень техники (3-9 по шкале) − штраф за ошибки (0-2)
+  Запрещено:
+    score = 6 − штраф (это даёт всем средний балл независимо от базы)
+
 ═══ ТЕХНИЧЕСКИЙ ПРОФИЛЬ ═══
 
 Оцени 6 элементов техники по шкале 1-10 на основе видео.
@@ -371,6 +382,17 @@ _PROMPTS = {
 - Если техника РЕАЛЬНО различается между кадрами — оценки кадров должны это отражать. НЕ давай всем кадрам одинаковый балл если виден прогресс/регресс/срыв.
 - Балл должен быть честным: видишь плуг → ставь 3, видишь чистый карвинг → 8-9, видишь падение → 1-2.
 
+АСИММЕТРИЯ ОЦЕНКИ — НЕ ТОЛЬКО ШТРАФУЕМ ЗА ОШИБКИ:
+- Сильные элементы ПОДНИМАЮТ балл, не только сглаживают штрафы.
+- "Есть угол кантования" ≠ "хороший apex" — оцениваешь КАЧЕСТВО исполнения, а не сам факт попытки.
+- Если в видео устойчивый карвинг в БОЛЬШИНСТВЕ поворотов → overall в диапазоне 7-9, НЕ 6.
+- Если ритмичный pole plant + чистая линия + динамичный переход → overall не ниже 7.
+- Если ДВА видео одной категории имеют РАЗНЫЙ базовый уровень техники — их баллы ДОЛЖНЫ отличаться. Не клади всех средне-сильных в один 6.
+- Балл отражает УРОВЕНЬ техники, а не только количество ошибок. Формула:
+    score = базовый уровень техники (3-9 по шкале) − штраф за ошибки (0-2)
+  Запрещено:
+    score = 6 − штраф (это даёт всем средний балл независимо от базы)
+
 ═══ ТЕХНИЧЕСКИЙ ПРОФИЛЬ ═══
 
 Оцени 6 элементов техники по шкале 1-10 на основе видео.
@@ -541,6 +563,17 @@ SCORING RULES:
 - If all elements are GENUINELY similar in quality — scores can be close. DO NOT create artificial spread.
 - If technique GENUINELY varies between frames — frame scores must reflect this. DO NOT give every frame the same score if progress/regress/breakdown is visible.
 - Score must be honest: see snowplow → put 3, see clean carving → 8-9, see a fall → 1-2.
+
+SCORING ASYMMETRY — DO NOT ONLY PENALIZE ERRORS:
+- Strong elements RAISE the score, not just offset penalties.
+- "Has edge angle" ≠ "good apex" — score the QUALITY of execution, not just the attempt.
+- If video shows consistent carving in MOST turns → overall is in 7-9 range, NOT 6.
+- If rhythmic pole plant + clean line + dynamic transition → overall is at least 7.
+- If TWO videos in the same category have DIFFERENT baseline technique — their scores MUST differ. Do not cluster mid-to-strong athletes all at 6.
+- Score reflects TECHNIQUE LEVEL, not just count of errors. Formula:
+    score = base technique level (3-9 on the scale) − error penalty (0-2)
+  Forbidden:
+    score = 6 − penalty (this gives everyone an average score regardless of baseline)
 
 ═══ TECHNICAL PROFILE ═══
 
@@ -717,6 +750,17 @@ SCORING RULES:
 - If technique GENUINELY varies between frames — frame scores must reflect this. DO NOT give every frame the same score if progress/regress/breakdown is visible.
 - Score must be honest: see snowplow → put 3, see clean carving → 8-9, see a fall → 1-2.
 
+SCORING ASYMMETRY — DO NOT ONLY PENALIZE ERRORS:
+- Strong elements RAISE the score, not just offset penalties.
+- "Has edge angle" ≠ "good apex" — score the QUALITY of execution, not just the attempt.
+- If video shows consistent carving in MOST turns → overall is in 7-9 range, NOT 6.
+- If rhythmic pole plant + clean line + dynamic transition → overall is at least 7.
+- If TWO videos in the same category have DIFFERENT baseline technique — their scores MUST differ. Do not cluster mid-to-strong athletes all at 6.
+- Score reflects TECHNIQUE LEVEL, not just count of errors. Formula:
+    score = base technique level (3-9 on the scale) − error penalty (0-2)
+  Forbidden:
+    score = 6 − penalty (this gives everyone an average score regardless of baseline)
+
 ═══ TECHNICAL PROFILE ═══
 
 Rate 6 technique elements on scale 1-10 based on the video.
@@ -886,6 +930,17 @@ OK to write: "above average for age", "developing ahead of typical", "creates a 
 - Если все элементы РЕАЛЬНО похожи по качеству — оценки могут быть близкими. НЕ создавай искусственный разброс.
 - Если техника РЕАЛЬНО различается между кадрами — оценки кадров должны это отражать. НЕ давай всем кадрам одинаковый балл если виден прогресс/регресс/срыв.
 - Балл должен быть честным: видишь плуг → ставь 3, видишь чистый карвинг → 8-9, видишь падение → 1-2.
+
+АСИММЕТРИЯ ОЦЕНКИ — НЕ ТОЛЬКО ШТРАФУЕМ ЗА ОШИБКИ:
+- Сильные элементы ПОДНИМАЮТ балл, не только сглаживают штрафы.
+- "Есть угол кантования" ≠ "хороший apex" — оцениваешь КАЧЕСТВО исполнения, а не сам факт попытки.
+- Если в видео устойчивый карвинг в БОЛЬШИНСТВЕ поворотов → overall в диапазоне 7-9, НЕ 6.
+- Если ритмичный pole plant + чистая линия + динамичный переход → overall не ниже 7.
+- Если ДВА видео одной категории имеют РАЗНЫЙ базовый уровень техники — их баллы ДОЛЖНЫ отличаться. Не клади всех средне-сильных в один 6.
+- Балл отражает УРОВЕНЬ техники, а не только количество ошибок. Формула:
+    score = базовый уровень техники (3-9 по шкале) − штраф за ошибки (0-2)
+  Запрещено:
+    score = 6 − штраф (это даёт всем средний балл независимо от базы)
 
 ═══ ТЕХНИЧЕСКИЙ ПРОФИЛЬ ═══
 
@@ -1065,6 +1120,17 @@ OK to write: "above average for age", "developing ahead of typical", "creates a 
 - Если техника РЕАЛЬНО различается между кадрами — оценки кадров должны это отражать. НЕ давай всем кадрам одинаковый балл если виден прогресс/регресс/срыв.
 - Балл должен быть честным: видишь плуг → ставь 3, видишь чистый карвинг → 8-9, видишь падение → 1-2.
 
+АСИММЕТРИЯ ОЦЕНКИ — НЕ ТОЛЬКО ШТРАФУЕМ ЗА ОШИБКИ:
+- Сильные элементы ПОДНИМАЮТ балл, не только сглаживают штрафы.
+- "Есть угол кантования" ≠ "хороший apex" — оцениваешь КАЧЕСТВО исполнения, а не сам факт попытки.
+- Если в видео устойчивый карвинг в БОЛЬШИНСТВЕ поворотов → overall в диапазоне 7-9, НЕ 6.
+- Если ритмичный pole plant + чистая линия + динамичный переход → overall не ниже 7.
+- Если ДВА видео одной категории имеют РАЗНЫЙ базовый уровень техники — их баллы ДОЛЖНЫ отличаться. Не клади всех средне-сильных в один 6.
+- Балл отражает УРОВЕНЬ техники, а не только количество ошибок. Формула:
+    score = базовый уровень техники (3-9 по шкале) − штраф за ошибки (0-2)
+  Запрещено:
+    score = 6 − штраф (это даёт всем средний балл независимо от базы)
+
 ═══ ТЕХНИЧЕСКИЙ ПРОФИЛЬ ═══
 
 Оцени 6 элементов техники по шкале 1-10 на основе видео.
@@ -1238,6 +1304,17 @@ SCORING RULES:
 - If all elements are GENUINELY similar in quality — scores can be close. DO NOT create artificial spread.
 - If technique GENUINELY varies between frames — frame scores must reflect this. DO NOT give every frame the same score if progress/regress/breakdown is visible.
 - Score must be honest: see snowplow → put 3, see clean carving → 8-9, see a fall → 1-2.
+
+SCORING ASYMMETRY — DO NOT ONLY PENALIZE ERRORS:
+- Strong elements RAISE the score, not just offset penalties.
+- "Has edge angle" ≠ "good apex" — score the QUALITY of execution, not just the attempt.
+- If video shows consistent carving in MOST turns → overall is in 7-9 range, NOT 6.
+- If rhythmic pole plant + clean line + dynamic transition → overall is at least 7.
+- If TWO videos in the same category have DIFFERENT baseline technique — their scores MUST differ. Do not cluster mid-to-strong athletes all at 6.
+- Score reflects TECHNIQUE LEVEL, not just count of errors. Formula:
+    score = base technique level (3-9 on the scale) − error penalty (0-2)
+  Forbidden:
+    score = 6 − penalty (this gives everyone an average score regardless of baseline)
 
 ═══ TECHNICAL PROFILE ═══
 
@@ -1414,6 +1491,17 @@ SCORING RULES:
 - If all elements are GENUINELY similar in quality — scores can be close. DO NOT create artificial spread.
 - If technique GENUINELY varies between frames — frame scores must reflect this. DO NOT give every frame the same score if progress/regress/breakdown is visible.
 - Score must be honest: see snowplow → put 3, see clean carving → 8-9, see a fall → 1-2.
+
+SCORING ASYMMETRY — DO NOT ONLY PENALIZE ERRORS:
+- Strong elements RAISE the score, not just offset penalties.
+- "Has edge angle" ≠ "good apex" — score the QUALITY of execution, not just the attempt.
+- If video shows consistent carving in MOST turns → overall is in 7-9 range, NOT 6.
+- If rhythmic pole plant + clean line + dynamic transition → overall is at least 7.
+- If TWO videos in the same category have DIFFERENT baseline technique — their scores MUST differ. Do not cluster mid-to-strong athletes all at 6.
+- Score reflects TECHNIQUE LEVEL, not just count of errors. Formula:
+    score = base technique level (3-9 on the scale) − error penalty (0-2)
+  Forbidden:
+    score = 6 − penalty (this gives everyone an average score regardless of baseline)
 
 ═══ TECHNICAL PROFILE ═══
 
