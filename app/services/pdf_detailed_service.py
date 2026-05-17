@@ -115,13 +115,16 @@ _I18N = {
 }
 
 # === TEXT LIMITS (chars) — clamp data BEFORE rendering ===
+# Text length budgets for clamping before render. Bumped after live PDF
+# review showed drill steps and potential bullets ending in "…" mid-thought
+# because GPT under the new calibration writes longer coaching language.
 _LIM = {
     "str_p1": 220,
     "weak_p1": 220,
     "phase_body": 160,
     "drill_name": 60,
-    "drill_detail": 140,
-    "potential": 160,
+    "drill_detail": 200,   # was 140 — drill Action/Focus/Success now fit fully
+    "potential": 220,      # was 160 — Potential bullets are longer with new scale
     "priority": 60,
 }
 
